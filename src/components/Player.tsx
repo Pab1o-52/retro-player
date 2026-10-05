@@ -9,6 +9,7 @@ export const Player = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const emulatorRef = useRef<NESEmulator | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [debugLog, setDebugLog] = useState<string>('Loading...');
 
   useEffect(() => {
     if (!activeGameId || !canvasRef.current) return;
@@ -23,13 +24,31 @@ export const Player = () => {
     }
 
     const emu = new NESEmulator(canvas);
+    emu.onError = (msg) => {
+      setDebugLog(prev => prev + '\n' + msg);
+    };
     emulatorRef.current = emu;
 
+    setDebugLog('Fetching ROM from DB...');
+
     getRomBuffer(activeGameId).then(buffer => {
-      if (buffer) {
-        emu.loadROM(buffer);
-        emu.start();
-      }
+      setTimeout(() => {
+        try {
+          if (buffer) {
+            setDebugLog(prev => prev + '\nBuffer fetched. Fast parsing...');
+            emu.loadROM(buffer);
+            setDebugLog(prev => prev + '\nStarting Emulator...');
+            emu.start();
+            setTimeout(() => setDebugLog(''), 500);
+          } else {
+            setDebugLog(prev => prev + '\nError: Empty buffer');
+          }
+        } catch (err: any) {
+          setDebugLog(prev => prev + '\nCrash: ' + err.message);
+        }
+      }, 100);
+    }).catch(err => {
+      setDebugLog(prev => prev + '\nDB Error: ' + err.message);
     });
 
     return () => {
@@ -73,8 +92,18 @@ export const Player = () => {
     }
   };
 
+  const handleInteraction = () => {
+    if (emulatorRef.current) {
+      emulatorRef.current.resumeAudio();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-4 touch-none">
+    <div 
+      className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]"
+      onTouchStart={handleInteraction}
+      onClick={handleInteraction}
+    >
       
       {/* Меню и Настройки (Top Bar) */}
       <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2">
@@ -92,15 +121,36 @@ export const Player = () => {
         </button>
       </div>
 
-      {/* Масштабирование экрана (Canvas) */}
-      <div className="w-full max-w-3xl mx-auto aspect-[256/240] flex justify-center items-center bg-gray-900 border-4 border-gray-700 rounded-lg overflow-hidden shadow-2xl mb-8">
+      {/* Масштабирование экрана (Canvas) - Retro TV Style */}
+      <div className="relative w-full max-w-3xl mx-auto aspect-[256/240] bg-black border-4 md:border-[12px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-2 sm:mb-8 flex justify-center items-center">
+        {/* Блик экрана */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-10" />
+        
+        {/* Эффект Scanlines */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-20 opacity-50" 
+          style={{ 
+            backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)', 
+            backgroundSize: '100% 4px' 
+          }} 
+        />
+
         <canvas 
           ref={canvasRef} 
           width={256} 
           height={240} 
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain relative z-0"
           style={{ imageRendering: 'pixelated' }}
         />
+
+        {/* On-Screen Logger */}
+        {debugLog && (
+          <div className="absolute inset-0 z-30 p-4 bg-black/80 flex items-start justify-start overflow-auto">
+            <pre className="text-green-500 font-mono text-xs whitespace-pre-wrap">
+              {debugLog}
+            </pre>
+          </div>
+        )}
       </div>
 
       {/* Наэкранный геймпад */}

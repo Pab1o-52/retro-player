@@ -20,6 +20,7 @@ interface EmulatorState {
   playGame: (id: string) => void;
   stopGame: () => void;
   getRomBuffer: (id: string) => Promise<ArrayBuffer | null>;
+  removeGame: (id: string) => Promise<void>;
 }
 
 export const useStore = create<EmulatorState>((set, get) => ({
@@ -46,5 +47,15 @@ export const useStore = create<EmulatorState>((set, get) => ({
   stopGame: () => set({ activeGameId: null }),
   getRomBuffer: async (id) => {
     return await localforage.getItem<ArrayBuffer>(`rom_${id}`);
+  },
+  removeGame: async (id: string) => {
+    // Удаляем сам ROM файл
+    await localforage.removeItem(`rom_${id}`);
+    
+    // Удаляем из каталога
+    const updatedGames = get().games.filter(g => g.id !== id);
+    await localforage.setItem('catalog', updatedGames);
+    
+    set({ games: updatedGames });
   }
 }));

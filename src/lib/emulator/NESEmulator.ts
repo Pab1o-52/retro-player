@@ -1,5 +1,6 @@
 import { NES } from 'jsnes';
 import { RingBuffer } from './RingBuffer';
+import { getAudioContext } from '../audioContext';
 
 export class NESEmulator {
   private nes: NES;
@@ -12,10 +13,11 @@ export class NESEmulator {
   private fpsInterval = 1000 / 60;
   private then = performance.now();
 
+  public onError: ((msg: string) => void) | null = null;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvasCtx = canvas.getContext('2d', { alpha: false })!;
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    this.audioCtx = new AudioContextClass();
+    this.audioCtx = getAudioContext();
     this.ringBuffer = new RingBuffer(8192);
     
     this.scriptProcessor = this.audioCtx.createScriptProcessor(4096, 0, 1);
@@ -49,22 +51,37 @@ export class NESEmulator {
     this.canvasCtx.putImageData(imageData, 0, 0);
   };
 
-  public async loadROM(romBuffer: ArrayBuffer) {
-    let binary = '';
-    const bytes = new Uint8Array(romBuffer);
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
+  public loadROM(buffer: ArrayBuffer) {
+    const u8 = new Uint8Array(buffer);
+    const chars = new Array(u8.length);
+    for (let i = 0; i < u8.length; i++) {
+      chars[i] = String.fromCharCode(u8[i]);
     }
-    this.nes.loadROM(binary);
+    const romString = chars.join('');
+    
+    this.nes.loadROM(romString);
   }
 
   public start() {
-    if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+    try {
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => console.warn('Audio resume blocked'));
+      }
+    } catch(err) {
+      console.warn('Audio resume error', err);
     }
+    
     this.isRunning = true;
     this.then = performance.now();
     this.loop();
+  }
+
+  public resumeAudio() {
+    try {
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => {});
+      }
+    } catch(err) {}
   }
 
   public stop() {
@@ -77,12 +94,20 @@ export class NESEmulator {
 
   private loop = () => {
     if (!this.isRunning) return;
-    this.animationFrameId = requestAnimationFrame(this.loop);
-    const now = performance.now();
-    const elapsed = now - this.then;
-    if (elapsed > this.fpsInterval) {
-      this.then = now - (elapsed % this.fpsInterval);
-      this.nes.frame();
+    
+    try {
+      const now = performance.now();
+      const elapsed = now - this.then;
+      
+      if (elapsed > this.fpsInterval) {
+        this.then = now - (elapsed % this.fpsInterval);
+        this.nes.frame();
+      }
+      
+      this.animationFrameId = requestAnimationFrame(this.loop);
+    } catch (err: any) {
+      this.isRunning = false;
+      if (this.onError) this.onError('Frame Crash: ' + err.message);
     }
   };
 

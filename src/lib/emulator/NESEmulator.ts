@@ -1,5 +1,6 @@
 import { NES } from 'jsnes';
 import { RingBuffer } from './RingBuffer';
+import { getAudioContext } from '../audioContext';
 
 export class NESEmulator {
   private nes: NES;
@@ -14,8 +15,7 @@ export class NESEmulator {
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvasCtx = canvas.getContext('2d', { alpha: false })!;
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    this.audioCtx = new AudioContextClass();
+    this.audioCtx = getAudioContext();
     this.ringBuffer = new RingBuffer(8192);
     
     this.scriptProcessor = this.audioCtx.createScriptProcessor(4096, 0, 1);

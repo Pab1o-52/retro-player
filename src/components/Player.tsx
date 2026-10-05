@@ -92,13 +92,25 @@ export const Player = () => {
         </button>
       </div>
 
-      {/* Масштабирование экрана (Canvas) */}
-      <div className="w-full max-w-3xl mx-auto aspect-[256/240] flex justify-center items-center bg-gray-900 border-4 border-gray-700 rounded-lg overflow-hidden shadow-2xl mb-8">
+      {/* Масштабирование экрана (Canvas) - Retro TV Style */}
+      <div className="relative w-full max-w-3xl mx-auto aspect-[256/240] bg-black border-[12px] md:border-[20px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-8 flex justify-center items-center">
+        {/* Блик экрана */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-10" />
+        
+        {/* Эффект Scanlines */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-20 opacity-50" 
+          style={{ 
+            backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)', 
+            backgroundSize: '100% 4px' 
+          }} 
+        />
+
         <canvas 
           ref={canvasRef} 
           width={256} 
           height={240} 
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain relative z-0"
           style={{ imageRendering: 'pixelated' }}
         />
       </div>

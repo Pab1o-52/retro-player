@@ -9,6 +9,7 @@ export const Player = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const emulatorRef = useRef<NESEmulator | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [debugLog, setDebugLog] = useState<string>('Loading...');
 
   useEffect(() => {
     if (!activeGameId || !canvasRef.current) return;
@@ -25,21 +26,28 @@ export const Player = () => {
     const emu = new NESEmulator(canvas);
     emulatorRef.current = emu;
 
+    setDebugLog('Fetching ROM from DB...');
+
     getRomBuffer(activeGameId)
       .then(buffer => {
-        try {
-          if (buffer) {
-            emu.loadROM(buffer);
-            emu.start();
-          } else {
-            alert('Ошибка: ROM-файл не найден в базе.');
+        setDebugLog(prev => prev + '\nBuffer fetched. Parsing...');
+        setTimeout(() => {
+          try {
+            if (buffer) {
+              emu.loadROM(buffer);
+              setDebugLog(prev => prev + '\nROM loaded. Starting...');
+              emu.start();
+              setDebugLog(''); // Clear log on success
+            } else {
+              setDebugLog(prev => prev + '\nError: Empty buffer');
+            }
+          } catch (err: any) {
+            setDebugLog(prev => prev + '\nCrash during loadROM: ' + err.message);
           }
-        } catch (err: any) {
-          alert('Ошибка запуска эмулятора: ' + err.message);
-        }
+        }, 100);
       })
       .catch((err: any) => {
-        alert('Ошибка чтения ROM из базы: ' + err.message);
+        setDebugLog(prev => prev + '\nDB Error: ' + err.message);
       });
 
     return () => {
@@ -133,6 +141,15 @@ export const Player = () => {
           className="w-full h-full object-contain relative z-0"
           style={{ imageRendering: 'pixelated' }}
         />
+
+        {/* On-Screen Logger */}
+        {debugLog && (
+          <div className="absolute inset-0 z-30 p-4 bg-black/80 flex items-start justify-start overflow-auto">
+            <pre className="text-green-500 font-mono text-xs whitespace-pre-wrap">
+              {debugLog}
+            </pre>
+          </div>
+        )}
       </div>
 
       {/* Наэкранный геймпад */}

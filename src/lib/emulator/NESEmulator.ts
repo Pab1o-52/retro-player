@@ -50,10 +50,13 @@ export class NESEmulator {
   };
 
   public async loadROM(romBuffer: ArrayBuffer) {
-    let binary = '';
     const bytes = new Uint8Array(romBuffer);
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
+    let binary = '';
+    // Чанками по 8192 байта, чтобы избежать превышения лимита стека и долгого цикла
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode.apply(null, chunk as any);
     }
     this.nes.loadROM(binary);
   }

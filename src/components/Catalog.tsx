@@ -38,19 +38,21 @@ export const Catalog = () => {
         </label>
       </div>
 
-      <div className="max-w-7xl mx-auto mb-8 bg-gray-800/80 border border-blue-500/30 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm text-sm sm:text-base">
-        <h2 className="text-lg sm:text-xl font-bold mb-2 flex items-center gap-2">
-          <span className="text-blue-400">ℹ️</span> Как начать играть?
-        </h2>
-        <p className="text-gray-300 leading-relaxed">
-          Эмулятор поддерживает игры для приставки Dendy / NES (формат <strong>.nes</strong>). 
-          Вы можете найти их в интернете по запросам вроде <a href="https://www.google.com/search?q=NES+ROMs+download" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">«NES ROMs»</a> или <a href="https://www.google.com/search?q=игры+денди+скачать" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">«Игры Денди скачать»</a>. 
-          <br/>
-          <span className="text-xs sm:text-sm text-gray-500 mt-2 block">
-            * Убедитесь, что скачиваемые файлы имеют расширение .nes. Скачивание некоторых игр может быть ограничено авторским правом.
-          </span>
-        </p>
-      </div>
+      {games.length === 0 && (
+        <div className="max-w-7xl mx-auto mb-8 bg-gray-800/80 border border-blue-500/30 rounded-xl p-4 sm:p-6 shadow-xl backdrop-blur-sm text-sm sm:text-base">
+          <h2 className="text-lg sm:text-xl font-bold mb-2 flex items-center gap-2">
+            <span className="text-blue-400">ℹ️</span> Как начать играть?
+          </h2>
+          <p className="text-gray-300 leading-relaxed">
+            Эмулятор поддерживает игры для приставки Dendy / NES (формат <strong>.nes</strong>). 
+            Вы можете найти их в интернете по запросам вроде <a href="https://www.google.com/search?q=NES+ROMs+download" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">«NES ROMs»</a> или <a href="https://www.google.com/search?q=игры+денди+скачать" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">«Игры Денди скачать»</a>. 
+            <br/>
+            <span className="text-xs sm:text-sm text-gray-500 mt-2 block">
+              * Убедитесь, что скачиваемые файлы имеют расширение .nes. Скачивание некоторых игр может быть ограничено авторским правом.
+            </span>
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 p-2 max-w-7xl mx-auto">
         {games.map(game => (

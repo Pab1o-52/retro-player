@@ -49,16 +49,8 @@ export class NESEmulator {
     this.canvasCtx.putImageData(imageData, 0, 0);
   };
 
-  public async loadROM(romBuffer: ArrayBuffer) {
-    const bytes = new Uint8Array(romBuffer);
-    let binary = '';
-    // Чанками по 8192 байта, чтобы избежать превышения лимита стека и долгого цикла
-    const chunkSize = 8192;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, i + chunkSize);
-      binary += String.fromCharCode.apply(null, chunk as any);
-    }
-    this.nes.loadROM(binary);
+  public async loadROM(romData: string) {
+    this.nes.loadROM(romData);
   }
 
   public start() {

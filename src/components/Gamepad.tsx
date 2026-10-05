@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { Controller } from 'jsnes';
+
 
 interface GamepadProps {
-  onButtonDown: (btn: number) => void;
-  onButtonUp: (btn: number) => void;
+  onButtonDown: (btn: string) => void;
+  onButtonUp: (btn: string) => void;
 }
 
 interface Point {
@@ -16,20 +16,20 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
   // Храним активные кнопки крестовины, чтобы отпускать их
-  const activeBtns = useRef<Set<number>>(new Set());
+  const activeBtns = useRef<Set<string>>(new Set());
 
   const triggerVibration = () => {
     if (navigator.vibrate) navigator.vibrate(15); 
   };
 
-  const handleStart = (btn: number) => (e: React.PointerEvent) => {
+  const handleStart = (btn: string) => (e: React.PointerEvent) => {
     e.preventDefault();
     try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch (err) {}
     triggerVibration();
     onButtonDown(btn);
   };
 
-  const handleEnd = (btn: number) => (e: React.PointerEvent) => {
+  const handleEnd = (btn: string) => (e: React.PointerEvent) => {
     e.preventDefault();
     try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch (err) {}
     onButtonUp(btn);
@@ -70,14 +70,14 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
 
     // Вычисляем зажатые кнопки (мертвая зона 15px)
     const deadzone = 15;
-    const newActive = new Set<number>();
+    const newActive = new Set<string>();
 
     if (distance > deadzone) {
       // Можно нажимать диагонали (например, влево + вверх)
-      if (dx < -deadzone) newActive.add(Controller.BUTTON_LEFT);
-      if (dx > deadzone) newActive.add(Controller.BUTTON_RIGHT);
-      if (dy < -deadzone) newActive.add(Controller.BUTTON_UP);
-      if (dy > deadzone) newActive.add(Controller.BUTTON_DOWN);
+      if (dx < -deadzone) newActive.add('left');
+      if (dx > deadzone) newActive.add('right');
+      if (dy < -deadzone) newActive.add('up');
+      if (dy > deadzone) newActive.add('down');
     }
 
     // Отпускаем старые, нажимаем новые
@@ -108,18 +108,18 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
         <div className="flex flex-col items-center">
           <button 
             className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"
-            onPointerDown={handleStart(Controller.BUTTON_SELECT)} 
-            onPointerUp={handleEnd(Controller.BUTTON_SELECT)} 
-            onPointerLeave={handleEnd(Controller.BUTTON_SELECT)}
+            onPointerDown={handleStart('select')} 
+            onPointerUp={handleEnd('select')} 
+            onPointerLeave={handleEnd('select')}
           />
           <span className="text-gray-400 font-bold mt-1 text-xs uppercase tracking-widest">Select</span>
         </div>
         <div className="flex flex-col items-center">
           <button 
             className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"
-            onPointerDown={handleStart(Controller.BUTTON_START)} 
-            onPointerUp={handleEnd(Controller.BUTTON_START)} 
-            onPointerLeave={handleEnd(Controller.BUTTON_START)}
+            onPointerDown={handleStart('start')} 
+            onPointerUp={handleEnd('start')} 
+            onPointerLeave={handleEnd('start')}
           />
           <span className="text-gray-400 font-bold mt-1 text-xs uppercase tracking-widest">Start</span>
         </div>
@@ -161,9 +161,9 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
           <div className="flex flex-col items-center">
             <button 
               className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-xl sm:text-3xl transition-all flex items-center justify-center"
-              onPointerDown={handleStart(Controller.BUTTON_B)} 
-              onPointerUp={handleEnd(Controller.BUTTON_B)} 
-              onPointerLeave={handleEnd(Controller.BUTTON_B)}
+              onPointerDown={handleStart('b')} 
+              onPointerUp={handleEnd('b')} 
+              onPointerLeave={handleEnd('b')}
             >
               B
             </button>
@@ -171,9 +171,9 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
           <div className="flex flex-col items-center mb-4 sm:mb-6">
             <button 
               className="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-xl sm:text-3xl transition-all flex items-center justify-center"
-              onPointerDown={handleStart(Controller.BUTTON_A)} 
-              onPointerUp={handleEnd(Controller.BUTTON_A)} 
-              onPointerLeave={handleEnd(Controller.BUTTON_A)}
+              onPointerDown={handleStart('a')} 
+              onPointerUp={handleEnd('a')} 
+              onPointerLeave={handleEnd('a')}
             >
               A
             </button>

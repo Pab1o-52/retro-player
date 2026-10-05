@@ -1,76 +1,58 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
-import { NESEmulator } from '../lib/emulator/NESEmulator';
 import { Gamepad } from './Gamepad';
-import { Controller } from 'jsnes';
+import { Nostalgist } from 'nostalgist';
 
 export const Player = () => {
-  const { activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const emulatorRef = useRef<NESEmulator | null>(null);
+  const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [debugLog, setDebugLog] = useState<string>('');
 
+  const activeGame = games.find(g => g.id === activeGameId);
+
   useEffect(() => {
-    if (!activeGameId || !canvasRef.current) return;
+    if (!activeGameId || !canvasRef.current || !activeGame) return;
     
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    if (ctx) ctx.clearRect(0, 0, 256, 240);
+    let isCancelled = false;
+    setDebugLog('Loading Emulator Core (WASM)...');
 
-    if (emulatorRef.current) {
-      emulatorRef.current.stop();
-    }
+    getRomBuffer(activeGameId).then(async (buffer) => {
+      if (isCancelled || !buffer) return;
+      
+      try {
+        const coreName = activeGame.system === 'sega' ? 'genesis_plus_gx' : 'fceumm';
+        
+        // Nostalgist automatically initializes WebGL context on the canvas
+        const nostalgist = await Nostalgist.launch({
+          core: coreName,
+          rom: buffer,
+          element: canvasRef.current!,
+          // Мы можем отключить встроенное управление, если хотим использовать только свой Gamepad
+          // но Nostalgist сам биндит стрелочки клавиатуры.
+        });
 
-    const emu = new NESEmulator(canvas);
-    emu.onError = (msg) => setDebugLog(prev => prev + '\n' + msg);
-    emulatorRef.current = emu;
-
-    getRomBuffer(activeGameId).then(buffer => {
-      setTimeout(() => {
-        try {
-          if (buffer) {
-            emu.loadROM(buffer);
-            emu.start();
-          }
-        } catch (err: any) {
-          setDebugLog('Crash: ' + err.message);
+        if (isCancelled) {
+          nostalgist.exit();
+          return;
         }
-      }, 50);
+
+        nostalgistRef.current = nostalgist;
+        setDebugLog('');
+      } catch (err: any) {
+        setDebugLog('Core Crash: ' + err.message);
+      }
     });
 
     return () => {
-      emu.stop();
-      emulatorRef.current = null;
+      isCancelled = true;
+      if (nostalgistRef.current) {
+        nostalgistRef.current.exit();
+        nostalgistRef.current = null;
+      }
     };
-  }, [activeGameId]);
-
-  useEffect(() => {
-    const keyMap: Record<string, number> = {
-      'ArrowUp': Controller.BUTTON_UP,
-      'ArrowDown': Controller.BUTTON_DOWN,
-      'ArrowLeft': Controller.BUTTON_LEFT,
-      'ArrowRight': Controller.BUTTON_RIGHT,
-      'x': Controller.BUTTON_A,
-      'z': Controller.BUTTON_B,
-      'Enter': Controller.BUTTON_START,
-      'Shift': Controller.BUTTON_SELECT,
-    };
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (keyMap[e.key] !== undefined) emulatorRef.current?.buttonDown(1, keyMap[e.key]);
-    };
-    const onKeyUp = (e: KeyboardEvent) => {
-      if (keyMap[e.key] !== undefined) emulatorRef.current?.buttonUp(1, keyMap[e.key]);
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-    };
-  }, []);
+  }, [activeGameId, activeGame]);
 
   const handleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -80,15 +62,10 @@ export const Player = () => {
     }
   };
 
-  const handleInteraction = () => {
-    if (emulatorRef.current) {
-      emulatorRef.current.resumeAudio();
-    }
-  };
-
   const handleSave = async () => {
-    if (emulatorRef.current && activeGameId) {
-      const state = emulatorRef.current.saveState();
+    if (nostalgistRef.current && activeGameId) {
+      const state = await nostalgistRef.current.saveState();
+      // Nostalgist saveState returns a Blob, which we can save to IndexedDB
       await saveGameState(activeGameId, state);
       setIsSettingsOpen(false);
       setDebugLog('Сохранено!');
@@ -97,10 +74,10 @@ export const Player = () => {
   };
 
   const handleLoad = async () => {
-    if (emulatorRef.current && activeGameId) {
-      const state = await loadGameState(activeGameId);
-      if (state) {
-        emulatorRef.current.loadState(state);
+    if (nostalgistRef.current && activeGameId) {
+      const stateBlob = await loadGameState(activeGameId);
+      if (stateBlob) {
+        await nostalgistRef.current.loadState(stateBlob.state); // nostalgist api
         setIsSettingsOpen(false);
         setDebugLog('Загружено!');
         setTimeout(() => setDebugLog(''), 2000);
@@ -111,12 +88,17 @@ export const Player = () => {
     }
   };
 
+  // Временная заглушка для Gamepad: Nostalgist использует RetroArch эмуляцию ввода.
+  // Идеально было бы использовать nostalgist.pressDown('a'), но нужно маппить кнопки.
+  const handleButtonDown = (btn: string) => {
+    if (nostalgistRef.current) nostalgistRef.current.pressDown(btn);
+  };
+  const handleButtonUp = (btn: string) => {
+    if (nostalgistRef.current) nostalgistRef.current.pressUp(btn);
+  };
+
   return (
-    <div 
-      className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]"
-      onTouchStart={handleInteraction}
-      onClick={handleInteraction}
-    >
+    <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]">
       
       <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2">
         <button 
@@ -134,12 +116,10 @@ export const Player = () => {
       </div>
 
       <div className="relative w-full max-w-3xl mx-auto aspect-[256/240] bg-black border-4 md:border-[12px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-2 sm:mb-8 flex justify-center items-center">
-
-
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-10" />
+        
         <canvas 
           ref={canvasRef} 
-          width={256} 
-          height={240} 
           className="w-full h-full object-contain relative z-0"
           style={{ imageRendering: 'pixelated' }}
         />
@@ -153,9 +133,11 @@ export const Player = () => {
         )}
       </div>
 
+      {/* Пока что Gamepad.tsx использует коды jsnes, это сломается. 
+          Надо переписать Gamepad.tsx на отправку строковых команд (up, down, a, b, start, select). */}
       <Gamepad 
-        onButtonDown={(btn) => emulatorRef.current?.buttonDown(1, btn)} 
-        onButtonUp={(btn) => emulatorRef.current?.buttonUp(1, btn)} 
+        onButtonDown={handleButtonDown}
+        onButtonUp={handleButtonUp}
       />
 
       {isSettingsOpen && (

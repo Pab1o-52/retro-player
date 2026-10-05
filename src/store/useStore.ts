@@ -10,6 +10,7 @@ export interface Game {
   id: string;
   title: string;
   addedAt: number;
+  system: string;
 }
 
 interface EmulatorState {
@@ -63,3 +64,5 @@ export const useStore = create<EmulatorState>((set, get) => ({
     return await localforage.getItem(`save_${id}`);
   }
 }));
+
+

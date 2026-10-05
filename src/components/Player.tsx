@@ -24,6 +24,9 @@ export const Player = () => {
     }
 
     const emu = new NESEmulator(canvas);
+    emu.onError = (msg) => {
+      setDebugLog(prev => prev + '\n' + msg);
+    };
     emulatorRef.current = emu;
 
     setDebugLog('Fetching ROM from DB...');

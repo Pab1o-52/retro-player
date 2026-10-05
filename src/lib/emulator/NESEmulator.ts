@@ -13,6 +13,8 @@ export class NESEmulator {
   private fpsInterval = 1000 / 60;
   private then = performance.now();
 
+  public onError: ((msg: string) => void) | null = null;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvasCtx = canvas.getContext('2d', { alpha: false })!;
     this.audioCtx = getAudioContext();
@@ -29,10 +31,11 @@ export class NESEmulator {
 
     this.nes = new NES({
       onFrame: this.onFrame,
-      onAudioSample: (left: number, _right: number) => {
-        this.ringBuffer.enq(left);
-      },
-      sampleRate: 44100,
+      // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ИЗОЛЯЦИИ ПРОБЛЕМЫ ЗАВИСАНИЯ MAIN THREAD
+      // onAudioSample: (left: number, _right: number) => {
+      //   this.ringBuffer.enq(left);
+      // },
+      // sampleRate: 44100,
     });
   }
 
@@ -85,12 +88,20 @@ export class NESEmulator {
 
   private loop = () => {
     if (!this.isRunning) return;
-    this.animationFrameId = requestAnimationFrame(this.loop);
-    const now = performance.now();
-    const elapsed = now - this.then;
-    if (elapsed > this.fpsInterval) {
-      this.then = now - (elapsed % this.fpsInterval);
-      this.nes.frame();
+    
+    try {
+      const now = performance.now();
+      const elapsed = now - this.then;
+      
+      if (elapsed > this.fpsInterval) {
+        this.then = now - (elapsed % this.fpsInterval);
+        this.nes.frame();
+      }
+      
+      this.animationFrameId = requestAnimationFrame(this.loop);
+    } catch (err: any) {
+      this.isRunning = false;
+      if (this.onError) this.onError('Frame Crash: ' + err.message);
     }
   };
 

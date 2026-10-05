@@ -122,7 +122,7 @@ export const Player = () => {
       </div>
 
       {/* Масштабирование экрана (Canvas) - Retro TV Style */}
-      <div className="relative w-full max-w-3xl mx-auto aspect-[256/240] bg-black border-[12px] md:border-[20px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-8 flex justify-center items-center">
+      <div className="relative w-full max-w-3xl mx-auto aspect-[256/240] bg-black border-4 md:border-[12px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-2 sm:mb-8 flex justify-center items-center">
         {/* Блик экрана */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-10" />
         

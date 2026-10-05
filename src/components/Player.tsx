@@ -25,12 +25,22 @@ export const Player = () => {
     const emu = new NESEmulator(canvas);
     emulatorRef.current = emu;
 
-    getRomBuffer(activeGameId).then(buffer => {
-      if (buffer) {
-        emu.loadROM(buffer);
-        emu.start();
-      }
-    });
+    getRomBuffer(activeGameId)
+      .then(buffer => {
+        try {
+          if (buffer) {
+            emu.loadROM(buffer);
+            emu.start();
+          } else {
+            alert('Ошибка: ROM-файл не найден в базе.');
+          }
+        } catch (err: any) {
+          alert('Ошибка запуска эмулятора: ' + err.message);
+        }
+      })
+      .catch((err: any) => {
+        alert('Ошибка чтения ROM из базы: ' + err.message);
+      });
 
     return () => {
       emu.stop();
@@ -73,8 +83,18 @@ export const Player = () => {
     }
   };
 
+  const handleInteraction = () => {
+    if (emulatorRef.current) {
+      emulatorRef.current.resumeAudio();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]">
+    <div 
+      className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]"
+      onTouchStart={handleInteraction}
+      onClick={handleInteraction}
+    >
       
       {/* Меню и Настройки (Top Bar) */}
       <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2">

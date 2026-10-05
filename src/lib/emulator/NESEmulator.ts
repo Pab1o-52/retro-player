@@ -59,12 +59,25 @@ export class NESEmulator {
   }
 
   public start() {
-    if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+    try {
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => console.warn('Audio resume blocked'));
+      }
+    } catch(err) {
+      console.warn('Audio resume error', err);
     }
+    
     this.isRunning = true;
     this.then = performance.now();
     this.loop();
+  }
+
+  public resumeAudio() {
+    try {
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => {});
+      }
+    } catch(err) {}
   }
 
   public stop() {

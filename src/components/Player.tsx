@@ -31,43 +31,25 @@ export const Player = () => {
 
     setDebugLog('Fetching ROM from DB...');
 
-    getRomBuffer(activeGameId)
-      .then(buffer => {
-        if (!buffer) {
-          setDebugLog(prev => prev + '\nError: Empty buffer');
-          return;
-        }
-        setDebugLog(prev => prev + '\nBuffer fetched. Native parsing...');
-
-        // Используем нативный парсер браузера, чтобы не вешать Main Thread
-        const blob = new Blob([buffer]);
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-          try {
-            const binaryString = event.target?.result as string;
-            setDebugLog(prev => prev + '\nParsed. Loading JSnes...');
-            emu.loadROM(binaryString);
-            
+    getRomBuffer(activeGameId).then(buffer => {
+      setTimeout(() => {
+        try {
+          if (buffer) {
+            setDebugLog(prev => prev + '\nBuffer fetched. Fast parsing...');
+            emu.loadROM(buffer);
             setDebugLog(prev => prev + '\nStarting Emulator...');
             emu.start();
-            
-            // Скрываем логгер при успешном старте
             setTimeout(() => setDebugLog(''), 500);
-          } catch (err: any) {
-            setDebugLog(prev => prev + '\njsnes Error: ' + err.message);
+          } else {
+            setDebugLog(prev => prev + '\nError: Empty buffer');
           }
-        };
-
-        reader.onerror = function() {
-          setDebugLog(prev => prev + '\nFileReader Error');
-        };
-
-        reader.readAsBinaryString(blob);
-      })
-      .catch((err: any) => {
-        setDebugLog(prev => prev + '\nDB Error: ' + err.message);
-      });
+        } catch (err: any) {
+          setDebugLog(prev => prev + '\nCrash: ' + err.message);
+        }
+      }, 100);
+    }).catch(err => {
+      setDebugLog(prev => prev + '\nDB Error: ' + err.message);
+    });
 
     return () => {
       emu.stop();

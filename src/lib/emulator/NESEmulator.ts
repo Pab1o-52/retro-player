@@ -31,11 +31,10 @@ export class NESEmulator {
 
     this.nes = new NES({
       onFrame: this.onFrame,
-      // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ ИЗОЛЯЦИИ ПРОБЛЕМЫ ЗАВИСАНИЯ MAIN THREAD
-      // onAudioSample: (left: number, _right: number) => {
-      //   this.ringBuffer.enq(left);
-      // },
-      // sampleRate: 44100,
+      onAudioSample: (left: number, _right: number) => {
+        this.ringBuffer.enq(left);
+      },
+      sampleRate: 44100,
     });
   }
 
@@ -52,8 +51,15 @@ export class NESEmulator {
     this.canvasCtx.putImageData(imageData, 0, 0);
   };
 
-  public async loadROM(romData: string) {
-    this.nes.loadROM(romData);
+  public loadROM(buffer: ArrayBuffer) {
+    const u8 = new Uint8Array(buffer);
+    const chars = new Array(u8.length);
+    for (let i = 0; i < u8.length; i++) {
+      chars[i] = String.fromCharCode(u8[i]);
+    }
+    const romString = chars.join('');
+    
+    this.nes.loadROM(romString);
   }
 
   public start() {

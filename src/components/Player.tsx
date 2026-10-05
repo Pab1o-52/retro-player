@@ -74,7 +74,7 @@ export const Player = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-4 touch-none">
+    <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]">
       
       {/* Меню и Настройки (Top Bar) */}
       <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2">

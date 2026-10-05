@@ -39,7 +39,8 @@ export const useStore = create<EmulatorState>((set, get) => ({
     await localforage.setItem(`rom_${id}`, buffer);
     const newGame: Game = {
       id,
-      title: file.name.replace(/\.(nes)$/i, ''),
+      title: file.name.replace(/\.[a-zA-Z0-9]+$/i, ''),
+      system: file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.gen') || file.name.toLowerCase().endsWith('.smd') || file.name.toLowerCase().endsWith('.bin') ? 'sega' : 'nes',
       addedAt: Date.now()
     };
     const updatedGames = [...get().games, newGame];

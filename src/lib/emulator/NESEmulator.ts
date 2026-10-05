@@ -113,4 +113,13 @@ export class NESEmulator {
 
   public buttonDown(player: number, button: number) { this.nes.buttonDown(player, button); }
   public buttonUp(player: number, button: number) { this.nes.buttonUp(player, button); }
+
+  public saveState(): any {
+    return this.nes.toJSON();
+  }
+
+  public loadState(data: any) {
+    this.nes.fromJSON(data);
+  }
 }
+

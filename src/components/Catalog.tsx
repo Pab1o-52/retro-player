@@ -76,7 +76,7 @@ export const Catalog = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (window.confirm(\`Удалить игру "\${game.title}"?\`)) {
+                if (window.confirm(`Удалить игру "${game.title}"?`)) {
                   removeGame(game.id);
                 }
               }}
@@ -96,7 +96,7 @@ export const Catalog = () => {
 
             <div className="h-28 sm:h-48 bg-black flex items-center justify-center rounded border-2 sm:border-4 border-gray-800 overflow-hidden relative shadow-[inset_0_0_15px_rgba(0,0,0,1)] mt-2">
                <img 
-                 src={\`https://tse1.mm.bing.net/th?q=\${encodeURIComponent('NES game cover ' + game.title)}\`}
+                 src={`https://tse1.mm.bing.net/th?q=${encodeURIComponent('NES game cover ' + game.title)}`}
                  alt={game.title}
                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
                  onError={(e) => {

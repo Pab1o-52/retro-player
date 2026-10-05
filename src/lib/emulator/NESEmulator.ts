@@ -115,11 +115,12 @@ export class NESEmulator {
   public buttonUp(player: number, button: number) { this.nes.buttonUp(player, button); }
 
   public saveState(): any {
-    return this.nes.toJSON();
+    return (this.nes as any).toJSON();
   }
 
   public loadState(data: any) {
-    this.nes.fromJSON(data);
+    (this.nes as any).fromJSON(data);
   }
 }
+
 

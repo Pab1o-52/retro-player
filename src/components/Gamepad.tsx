@@ -25,10 +25,10 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 flex justify-between items-center" style={{ touchAction: 'none' }}>
+    <div className="w-full max-w-3xl mx-auto px-2 flex flex-row flex-wrap justify-center sm:justify-between items-center gap-x-4 gap-y-8 scale-90 sm:scale-100 origin-bottom" style={{ touchAction: 'none' }}>
       
       {/* Крестовина (слева) */}
-      <div className="relative w-40 h-40 bg-gray-800 rounded-full shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] border-4 border-gray-700 flex items-center justify-center">
+      <div className="relative w-40 h-40 bg-gray-800 rounded-full shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] border-4 border-gray-700 flex items-center justify-center shrink-0">
         {/* Крестовина фон */}
         <div className="absolute w-12 h-28 bg-gray-900 rounded-sm shadow-[0_2px_10px_rgba(0,0,0,0.5)]" />
         <div className="absolute w-28 h-12 bg-gray-900 rounded-sm shadow-[0_2px_10px_rgba(0,0,0,0.5)]" />
@@ -64,11 +64,33 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
         </div>
       </div>
 
-      {/* Кнопки A/B (справа) */}
-      <div className="flex gap-6 items-end pb-4 bg-gray-800 p-6 rounded-full shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] border-4 border-gray-700">
+      {/* Кнопки Select / Start (По центру) */}
+      <div className="flex gap-4 items-end pb-4 shrink-0 mt-4 sm:mt-0 order-last sm:order-none w-full sm:w-auto justify-center">
         <div className="flex flex-col items-center">
           <button 
-            className="w-20 h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-3xl transition-all"
+            className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"
+            onPointerDown={handleStart(Controller.BUTTON_SELECT)} 
+            onPointerUp={handleEnd(Controller.BUTTON_SELECT)} 
+            onPointerLeave={handleEnd(Controller.BUTTON_SELECT)}
+          />
+          <span className="text-gray-400 font-bold mt-2 text-xs uppercase tracking-widest">Select</span>
+        </div>
+        <div className="flex flex-col items-center">
+          <button 
+            className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"
+            onPointerDown={handleStart(Controller.BUTTON_START)} 
+            onPointerUp={handleEnd(Controller.BUTTON_START)} 
+            onPointerLeave={handleEnd(Controller.BUTTON_START)}
+          />
+          <span className="text-gray-400 font-bold mt-2 text-xs uppercase tracking-widest">Start</span>
+        </div>
+      </div>
+
+      {/* Кнопки A/B (справа) */}
+      <div className="flex gap-6 items-end pb-4 bg-gray-800 p-6 rounded-full shadow-[inset_0_4px_15px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] border-4 border-gray-700 shrink-0">
+        <div className="flex flex-col items-center">
+          <button 
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-2xl sm:text-3xl transition-all"
             onPointerDown={handleStart(Controller.BUTTON_B)} 
             onPointerUp={handleEnd(Controller.BUTTON_B)} 
             onPointerLeave={handleEnd(Controller.BUTTON_B)}
@@ -79,7 +101,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp }: GamepadProps) => {
         </div>
         <div className="flex flex-col items-center mb-6">
           <button 
-            className="w-20 h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-3xl transition-all"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 shadow-[inset_0_4px_4px_rgba(255,255,255,0.3),0_6px_0_#7f1d1d,0_10px_15px_rgba(0,0,0,0.5)] active:translate-y-[6px] active:shadow-[inset_0_2px_2px_rgba(255,255,255,0.1),0_0px_0_#7f1d1d,0_4px_5px_rgba(0,0,0,0.5)] text-white font-extrabold text-2xl sm:text-3xl transition-all"
             onPointerDown={handleStart(Controller.BUTTON_A)} 
             onPointerUp={handleEnd(Controller.BUTTON_A)} 
             onPointerLeave={handleEnd(Controller.BUTTON_A)}

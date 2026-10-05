@@ -52,21 +52,42 @@ export const Catalog = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 p-6 max-w-7xl mx-auto">
         {games.map(game => (
-          <div key={game.id} className="bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-blue-500 transition-colors p-4 flex flex-col gap-4">
-            <div className="h-40 bg-gray-900 flex items-center justify-center rounded-lg border border-gray-700">
-               <span className="text-gray-600 font-bold text-4xl">NES</span>
+          <div key={game.id} className="relative bg-gray-700 rounded-lg p-3 pt-6 shadow-[0_10px_20px_rgba(0,0,0,0.6),inset_0_2px_5px_rgba(255,255,255,0.2)] border-b-[12px] border-gray-900 flex flex-col gap-3 group transition-transform hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.8)]">
+            
+            {/* Ребра картриджа сверху */}
+            <div className="absolute top-0 left-0 right-0 h-6 flex justify-center gap-2 pt-2">
+               <div className="w-2 h-4 bg-gray-800 rounded-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+               <div className="w-2 h-4 bg-gray-800 rounded-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+               <div className="w-2 h-4 bg-gray-800 rounded-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+               <div className="w-2 h-4 bg-gray-800 rounded-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
+               <div className="w-2 h-4 bg-gray-800 rounded-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"></div>
             </div>
-            <div className="flex flex-col justify-between flex-1">
-              <h3 className="font-bold text-lg truncate mb-4">{game.title}</h3>
+
+            {/* Картинка / Обложка игры */}
+            <div className="h-48 bg-black flex items-center justify-center rounded border-4 border-gray-800 overflow-hidden relative shadow-[inset_0_0_15px_rgba(0,0,0,1)]">
+               <img 
+                 src={`https://tse1.mm.bing.net/th?q=${encodeURIComponent('NES game cover ' + game.title)}`}
+                 alt={game.title}
+                 className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                 onError={(e) => {
+                   (e.target as HTMLImageElement).style.display = 'none';
+                   (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                 }}
+               />
+               <span className="hidden absolute text-gray-500 font-bold text-4xl tracking-widest uppercase">NES</span>
+            </div>
+
+            {/* Блок с названием и кнопкой */}
+            <div className="flex flex-col justify-between flex-1 bg-gray-800 p-3 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] border border-gray-900 mt-2">
+              <h3 className="font-bold text-md text-yellow-500 truncate mb-3 drop-shadow-md text-center">{game.title}</h3>
               <button 
                 onClick={() => handlePlay(game.id)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+                className="w-full bg-gradient-to-b from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border border-red-900 text-white px-4 py-2 rounded font-extrabold shadow-[0_4px_6px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all uppercase tracking-wider text-sm"
               >
-                Играть
+                Insert Coin
               </button>
-
             </div>
           </div>
         ))}

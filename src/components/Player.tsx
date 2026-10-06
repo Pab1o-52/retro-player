@@ -10,7 +10,7 @@ try {
 } catch (e) {}
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, netplayStatus, setNetplayStatus } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -61,6 +61,20 @@ export const Player = () => {
             input_player2_down: 'g',
             input_player2_left: 'f',
             input_player2_right: 'h',
+            
+            // P1 Keyboard Map (ZXC = ABC, ASD = XYZ)
+            input_player1_y: 'z', // Sega A
+            input_player1_b: 'x', // Sega B
+            input_player1_a: 'c', // Sega C
+            input_player1_l: 'a', // Sega X
+            input_player1_x: 's', // Sega Y
+            input_player1_r: 'd', // Sega Z
+            input_player1_start: 'enter',
+            input_player1_select: 'shift',
+            input_player1_up: 'up',
+            input_player1_down: 'down',
+            input_player1_left: 'left',
+            input_player1_right: 'right',
           }
         });
 
@@ -345,8 +359,23 @@ export const Player = () => {
               />
             </div>
 
+
             <div className="flex flex-col gap-2">
               <label className="text-gray-300 font-medium">Количество кнопок</label>
+              <div className="flex flex-col gap-2 mt-4 mb-4">
+                <label className="text-gray-300 font-medium">Тип крестовины (Движение):</label>
+                <div className="flex gap-2">
+                  {['analog', 'dpad'].map(type => (
+                    <button 
+                      key={type}
+                      onClick={() => setJoystickType(type as any)}
+                      className={`flex-1 py-1 rounded font-bold transition-colors ${joystickType === type ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                    >
+                      {type === 'analog' ? 'Аналог (Стик)' : 'Классика (Крестик)'}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <select 
                 value={buttonLayout}
                 onChange={(e) => setButtonLayout(parseInt(e.target.value) as 2|3|4|6)}

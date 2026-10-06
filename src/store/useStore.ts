@@ -28,6 +28,8 @@ interface EmulatorState {
   setJoystickScale: (scale: number) => void;
   buttonLayout: 2 | 3 | 4 | 6;
   setButtonLayout: (layout: 2 | 3 | 4 | 6) => void;
+  joystickType: 'analog' | 'dpad';
+  setJoystickType: (type: 'analog' | 'dpad') => void;
   netplayStatus: string | null;
   setNetplayStatus: (status: string | null) => void;
   netplayGameBuffer: ArrayBuffer | null;
@@ -79,6 +81,8 @@ export const useStore = create<EmulatorState>((set, get) => ({
   setJoystickScale: (scale) => set({ joystickScale: scale }),
   buttonLayout: 6,
   setButtonLayout: (layout) => set({ buttonLayout: layout }),
+  joystickType: 'analog',
+  setJoystickType: (type) => set({ joystickType: type }),
   netplayStatus: null,
   setNetplayStatus: (status) => set({ netplayStatus: status }),
   netplayGameBuffer: null,

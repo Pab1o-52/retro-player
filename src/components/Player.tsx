@@ -78,26 +78,15 @@ export const Player = () => {
     };
 
     netplayManager.onClientReady = () => {
-      // Client is ready, start sync interval
-      if (netplayManager.role === 'host') {
-        syncInterval.current = setInterval(async () => {
-          if (nostalgistRef.current) {
-            try {
-              const state = await nostalgistRef.current.saveState();
-              const buffer = await state.state.arrayBuffer();
-              netplayManager.sendSync(buffer);
-            } catch (e) {
-              console.error('Failed to sync state', e);
-            }
-          }
-        }, 5000);
-      }
+      // Disabled auto-sync because it causes severe lag
     };
 
     netplayManager.onSyncReceived = async (stateBuffer) => {
       if (nostalgistRef.current && netplayManager.role === 'client') {
         try {
+          setDebugLog('Синхронизация...');
           await nostalgistRef.current.loadState(new Blob([stateBuffer]));
+          setTimeout(() => setDebugLog(''), 2000);
         } catch (e) {
           console.error('Failed to load state', e);
         }
@@ -156,11 +145,20 @@ export const Player = () => {
   };
 
   const handleButtonDown = (btn: string) => {
-    if (nostalgistRef.current) nostalgistRef.current.pressDown(mapButton(btn, activeGame?.system));
+    if (nostalgistRef.current) {
+      const mapped = mapButton(btn, activeGame?.system);
+      const playerIndex = netplayManager.role === 'client' ? 2 : 1;
+      nostalgistRef.current.pressDown({ button: mapped, player: playerIndex });
+    }
     netplayManager.sendInput(btn, true);
   };
+  
   const handleButtonUp = (btn: string) => {
-    if (nostalgistRef.current) nostalgistRef.current.pressUp(mapButton(btn, activeGame?.system));
+    if (nostalgistRef.current) {
+      const mapped = mapButton(btn, activeGame?.system);
+      const playerIndex = netplayManager.role === 'client' ? 2 : 1;
+      nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
+    }
     netplayManager.sendInput(btn, false);
   };
 
@@ -250,9 +248,26 @@ export const Player = () => {
                     className="w-full bg-black border border-gray-700 text-green-400 p-2 rounded text-xs mb-2"
                     onClick={e => (e.target as HTMLInputElement).select()}
                   />
-                  <div className="text-xs text-center text-gray-500">
+                  <div className="text-xs text-center text-gray-500 mb-2">
                     Статус: {netplayStatus || 'Ожидание P2...'}
                   </div>
+                  {netplayStatus === 'Connected' && netplayManager.role === 'host' && (
+                    <button 
+                      onClick={async () => {
+                        if (nostalgistRef.current) {
+                          setDebugLog('Синхронизация...');
+                          const state = await nostalgistRef.current.saveState();
+                          const buffer = await state.state.arrayBuffer();
+                          netplayManager.sendSync(buffer);
+                          setIsSettingsOpen(false);
+                          setTimeout(() => setDebugLog(''), 2000);
+                        }
+                      }}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded font-bold w-full text-sm"
+                    >
+                      🔄 Синхронизировать игру
+                    </button>
+                  )}
                 </div>
               ) : (
                 <button 

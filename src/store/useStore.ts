@@ -60,7 +60,7 @@ export const useStore = create<EmulatorState>((set, get) => ({
     set({ activeGameId: null, netplayGameBuffer: null, netplayStatus: null });
   },
   getRomBuffer: async (id) => {
-    if (id === 'netplay-guest') return get().netplayGameBuffer;
+    if (id === get().activeGameId && get().netplayGameBuffer) return get().netplayGameBuffer;
     return await localforage.getItem<ArrayBuffer>(`rom_${id}`);
   },
   removeGame: async (id: string) => {
@@ -102,7 +102,7 @@ export const useStore = create<EmulatorState>((set, get) => ({
         await localforage.setItem(`rom_${gameId}`, buffer);
       }
       
-      set({ games: catalog, activeGameId: gameId });
+      set({ games: catalog, activeGameId: gameId, netplayGameBuffer: buffer });
     }
 }));
 

@@ -88,13 +88,26 @@ export const Player = () => {
     }
   };
 
-  // Временная заглушка для Gamepad: Nostalgist использует RetroArch эмуляцию ввода.
-  // Идеально было бы использовать nostalgist.pressDown('a'), но нужно маппить кнопки.
+  const mapButton = (btn: string, system: string | undefined): string => {
+    if (system === 'sega') {
+      switch (btn) {
+        case 'a': return 'y'; // Sega A -> RetroPad Y
+        case 'b': return 'b'; // Sega B -> RetroPad B
+        case 'c': return 'a'; // Sega C -> RetroPad A
+        case 'x': return 'l'; // Sega X -> RetroPad L
+        case 'y': return 'x'; // Sega Y -> RetroPad X
+        case 'z': return 'r'; // Sega Z -> RetroPad R
+        default: return btn;
+      }
+    }
+    return btn;
+  };
+
   const handleButtonDown = (btn: string) => {
-    if (nostalgistRef.current) nostalgistRef.current.pressDown(btn);
+    if (nostalgistRef.current) nostalgistRef.current.pressDown(mapButton(btn, activeGame?.system));
   };
   const handleButtonUp = (btn: string) => {
-    if (nostalgistRef.current) nostalgistRef.current.pressUp(btn);
+    if (nostalgistRef.current) nostalgistRef.current.pressUp(mapButton(btn, activeGame?.system));
   };
 
   return (

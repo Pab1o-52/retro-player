@@ -206,7 +206,7 @@ export const Player = () => {
         if (status === 'Connected' && activeGameId) {
           const buffer = await getRomBuffer(activeGameId);
           if (buffer) {
-            netplayManager.sendRom(activeGame!.title, activeGame!.system, new ArrayBuffer(0)); // Empty buffer for cloud gaming
+            netplayManager.sendRom(activeGame!.title, activeGame!.system, buffer); // Send actual ROM so client saves it
             setDebugLog('Sending ROM...');
           }
             const stream = (canvasRef.current as any)?.captureStream(30);

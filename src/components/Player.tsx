@@ -104,18 +104,18 @@ export const Player = () => {
             input_player2_right: 'h',
             
             // P1 Keyboard Map (ZXC = ABC, ASD = XYZ)
-            input_player1_y: 'nul', // Sega A
-            input_player1_b: 'nul', // Sega B
-            input_player1_a: 'nul', // Sega C
-            input_player1_l: 'nul', // Sega X
-            input_player1_x: 'nul', // Sega Y
-            input_player1_r: 'nul', // Sega Z
-            input_player1_start: 'nul',
-            input_player1_select: 'nul',
-            input_player1_up: 'nul',
-            input_player1_down: 'nul',
-            input_player1_left: 'nul',
-            input_player1_right: 'nul',
+            input_player1_y: 'z', // Sega A
+            input_player1_b: 'x', // Sega B
+            input_player1_a: 'c', // Sega C
+            input_player1_l: 'a', // Sega X
+            input_player1_x: 's', // Sega Y
+            input_player1_r: 'd', // Sega Z
+            input_player1_start: 'enter',
+            input_player1_select: 'shift',
+            input_player1_up: 'up',
+            input_player1_down: 'down',
+            input_player1_left: 'left',
+            input_player1_right: 'right',
           }
         });
 
@@ -283,17 +283,17 @@ export const Player = () => {
       <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2 gap-2">
         <button 
           onClick={() => setIsSettingsOpen(true)}
-          className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-bold transition-colors shadow whitespace-nowrap text-sm sm:text-base"
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-xl transition-colors shadow flex items-center justify-center"
         >
-          ⚙️ Настройки {netplayStatus === 'Connected' && <span className="text-green-500 ml-1">● P2</span>}
+          ⚙️ {netplayStatus === 'Connected' && <span className="text-green-500 ml-1 text-sm">●</span>}
         </button>
 
         <div className="flex gap-2 flex-1 justify-center">
-          <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold shadow text-xs sm:text-sm whitespace-nowrap">
-            💾 Сохранить
+          <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xl shadow flex items-center justify-center">
+            💾
           </button>
-          <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-bold shadow text-xs sm:text-sm whitespace-nowrap">
-            📂 Загрузить
+          <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xl shadow flex items-center justify-center">
+            📂
           </button>
         </div>
 
@@ -302,9 +302,9 @@ export const Player = () => {
             netplayManager.disconnect();
             stopGame();
           }}
-          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold transition-colors shadow whitespace-nowrap text-sm sm:text-base"
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xl transition-colors shadow flex items-center justify-center"
         >
-          Выйти
+          ❌
         </button>
       </div>
 

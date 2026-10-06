@@ -39,6 +39,11 @@ export const Player = () => {
           core: coreName,
           rom: buffer,
           element: canvasRef.current!,
+          retroarchConfig: {
+            input_libretro_device_p1: 1,
+            input_libretro_device_p2: 1,
+            input_player2_joypad_index: 1,
+          }
         });
 
         if (isCancelled) {

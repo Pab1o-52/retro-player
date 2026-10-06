@@ -30,6 +30,8 @@ interface EmulatorState {
   setButtonLayout: (layout: 2 | 3 | 4 | 6) => void;
   joystickType: 'analog' | 'dpad';
   setJoystickType: (type: 'analog' | 'dpad') => void;
+  keyBinds: Record<string, string>;
+  setKeyBinds: (binds: Record<string, string>) => void;
   netplayStatus: string | null;
   setNetplayStatus: (status: string | null) => void;
   netplayGameBuffer: ArrayBuffer | null;
@@ -83,6 +85,12 @@ export const useStore = create<EmulatorState>((set, get) => ({
   setButtonLayout: (layout) => set({ buttonLayout: layout }),
   joystickType: 'analog',
   setJoystickType: (type) => set({ joystickType: type }),
+  keyBinds: {
+    up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
+    a: 'KeyZ', b: 'KeyX', c: 'KeyC', x: 'KeyA', y: 'KeyS', z: 'KeyD',
+    start: 'Enter', select: 'ShiftLeft'
+  },
+  setKeyBinds: (binds) => set({ keyBinds: binds }),
   netplayStatus: null,
   setNetplayStatus: (status) => set({ netplayStatus: status }),
   netplayGameBuffer: null,

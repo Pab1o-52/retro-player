@@ -10,12 +10,25 @@ try {
 } catch (e) {}
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [debugLog, setDebugLog] = useState<string>('');
   const [inviteId, setInviteId] = useState<string>('');
+  const [mappingBtn, setMappingBtn] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mappingBtn) return;
+    const handleMapKey = (e: KeyboardEvent) => {
+      e.preventDefault();
+      setKeyBinds({ ...keyBinds, [mappingBtn]: e.code });
+      setMappingBtn(null);
+    };
+    window.addEventListener('keydown', handleMapKey, { once: true });
+    return () => window.removeEventListener('keydown', handleMapKey);
+  }, [mappingBtn, keyBinds]);
+
 
   const activeGame = games.find(g => g.id === activeGameId);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -63,18 +76,19 @@ export const Player = () => {
             input_player2_right: 'h',
             
             // P1 Keyboard Map (ZXC = ABC, ASD = XYZ)
-            input_player1_y: 'z', // Sega A
-            input_player1_b: 'x', // Sega B
-            input_player1_a: 'c', // Sega C
-            input_player1_l: 'a', // Sega X
-            input_player1_x: 's', // Sega Y
-            input_player1_r: 'd', // Sega Z
-            input_player1_start: 'enter',
-            input_player1_select: 'shift',
-            input_player1_up: 'up',
-            input_player1_down: 'down',
-            input_player1_left: 'left',
-            input_player1_right: 'right',
+            // Отключаем встроенную клавиатуру эмулятора, чтобы обрабатывать нажатия из React динамически
+            input_player1_y: 'nul',
+            input_player1_b: 'nul',
+            input_player1_a: 'nul',
+            input_player1_l: 'nul',
+            input_player1_x: 'nul',
+            input_player1_r: 'nul',
+            input_player1_start: 'nul',
+            input_player1_select: 'nul',
+            input_player1_up: 'nul',
+            input_player1_down: 'nul',
+            input_player1_left: 'nul',
+            input_player1_right: 'nul',
           }
         });
 
@@ -98,6 +112,34 @@ export const Player = () => {
       }
     };
   }, [activeGameId, activeGame]);
+
+  // Global Keyboard Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Find which button is mapped to this physical key
+      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
+      if (entry) {
+        e.preventDefault(); // Prevent scrolling with arrow keys
+        handleButtonDown(entry[0]);
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
+      if (entry) {
+        e.preventDefault();
+        handleButtonUp(entry[0]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('keyup', handleKeyUp, { passive: false });
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [keyBinds, activeGameId]);
 
   useEffect(() => {
     netplayManager.onConnectionStatus = (status) => {

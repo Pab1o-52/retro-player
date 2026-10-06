@@ -78,11 +78,6 @@ class NetplayManager {
           this.conn = connection;
           this.conn.on('open', () => {
             this.setupConnection();
-            
-            // Initiate Video Call
-            if (canvasStream) {
-              this.peer!.call(connection.peer, canvasStream);
-            }
           });
         });
         

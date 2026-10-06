@@ -3,9 +3,9 @@ import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 
 export const Catalog = () => {
-  const { games, addGame, loadGames, removeGame, playGame, resumeAudioContext } = useStore();
+  const { games, addGame, loadGames, removeGame, playGame,  } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isHintOpen, setIsHintOpen] = useState(false);
+  
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -14,8 +14,8 @@ export const Catalog = () => {
   }, []);
 
   useEffect(() => {
-    if (games.length === 0) setIsHintOpen(true);
-    else setIsHintOpen(false);
+    if (games.length === 0) 
+    
   }, [games.length]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +24,7 @@ export const Catalog = () => {
   };
 
   const handlePlay = (id: string) => {
-    resumeAudioContext();
+    ();
     playGame(id);
   };
 

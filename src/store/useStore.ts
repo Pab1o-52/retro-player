@@ -28,6 +28,10 @@ interface EmulatorState {
   setJoystickScale: (scale: number) => void;
   buttonLayout: 2 | 3 | 4 | 6;
   setButtonLayout: (layout: 2 | 3 | 4 | 6) => void;
+  netplayStatus: string | null;
+  setNetplayStatus: (status: string | null) => void;
+  netplayGameBuffer: ArrayBuffer | null;
+  setNetplayGame: (title: string, system: string, buffer: ArrayBuffer) => void;
 }
 
 export const useStore = create<EmulatorState>((set, get) => ({
@@ -52,8 +56,11 @@ export const useStore = create<EmulatorState>((set, get) => ({
     set({ games: updatedGames });
   },
   playGame: (id) => set({ activeGameId: id }),
-  stopGame: () => set({ activeGameId: null }),
+  stopGame: () => {
+    set({ activeGameId: null, netplayGameBuffer: null, netplayStatus: null });
+  },
   getRomBuffer: async (id) => {
+    if (id === 'netplay-guest') return get().netplayGameBuffer;
     return await localforage.getItem<ArrayBuffer>(`rom_${id}`);
   },
   removeGame: async (id: string) => {
@@ -71,7 +78,16 @@ export const useStore = create<EmulatorState>((set, get) => ({
   joystickScale: 1,
   setJoystickScale: (scale) => set({ joystickScale: scale }),
   buttonLayout: 6,
-  setButtonLayout: (layout) => set({ buttonLayout: layout })
+  setButtonLayout: (layout) => set({ buttonLayout: layout }),
+  netplayStatus: null,
+  setNetplayStatus: (status) => set({ netplayStatus: status }),
+  netplayGameBuffer: null,
+  setNetplayGame: (title, system, buffer) => {
+    // Add temporary game to list if not there
+    const tempGame = { id: 'netplay-guest', title, system, addedAt: Date.now() };
+    const games = get().games.filter(g => g.id !== 'netplay-guest');
+    set({ games: [tempGame, ...games], netplayGameBuffer: buffer, activeGameId: 'netplay-guest' });
+  }
 }));
 
 

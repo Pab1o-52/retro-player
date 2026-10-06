@@ -2,15 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { Gamepad } from './Gamepad';
 import { Nostalgist } from 'nostalgist';
+import { netplayManager } from '../lib/multiplayer/NetplayManager';
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, netplayStatus, setNetplayStatus } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [debugLog, setDebugLog] = useState<string>('');
+  const [inviteId, setInviteId] = useState<string>('');
 
   const activeGame = games.find(g => g.id === activeGameId);
+  const syncInterval = useRef<any>(null);
 
   useEffect(() => {
     if (!activeGameId || !canvasRef.current || !activeGame) return;
@@ -24,13 +27,10 @@ export const Player = () => {
       try {
         const coreName = activeGame.system === 'sega' ? 'genesis_plus_gx' : 'fceumm';
         
-        // Nostalgist automatically initializes WebGL context on the canvas
         const nostalgist = await Nostalgist.launch({
           core: coreName,
           rom: buffer,
           element: canvasRef.current!,
-          // Мы можем отключить встроенное управление, если хотим использовать только свой Gamepad
-          // но Nostalgist сам биндит стрелочки клавиатуры.
         });
 
         if (isCancelled) {
@@ -40,6 +40,12 @@ export const Player = () => {
 
         nostalgistRef.current = nostalgist;
         setDebugLog('');
+
+        // If client, we are ready!
+        if (netplayManager.role === 'client') {
+          netplayManager.sendReady();
+        }
+
       } catch (err: any) {
         setDebugLog('Core Crash: ' + err.message);
       }
@@ -51,8 +57,45 @@ export const Player = () => {
         nostalgistRef.current.exit();
         nostalgistRef.current = null;
       }
+      if (syncInterval.current) clearInterval(syncInterval.current);
     };
   }, [activeGameId, activeGame]);
+
+  useEffect(() => {
+    netplayManager.onConnectionStatus = (status) => {
+      setNetplayStatus(status);
+      setDebugLog('Netplay: ' + status);
+      setTimeout(() => setDebugLog(''), 3000);
+    };
+
+    netplayManager.onInputReceived = (btn, isDown) => {
+      if (!nostalgistRef.current) return;
+      // We map the button to the system
+      const mapped = mapButton(btn, activeGame?.system);
+      const playerIndex = netplayManager.role === 'host' ? 2 : 1; // if host, input is from p2. if client, input is from p1.
+      if (isDown) nostalgistRef.current.pressDown({ button: mapped, player: playerIndex });
+      else nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
+    };
+
+    netplayManager.onClientReady = () => {
+      // Client is ready, start sync interval
+      if (netplayManager.role === 'host') {
+        syncInterval.current = setInterval(async () => {
+          if (nostalgistRef.current) {
+            const state = await nostalgistRef.current.saveState();
+            netplayManager.sendSync(state.state);
+          }
+        }, 5000);
+      }
+    };
+
+    netplayManager.onSyncReceived = async (stateBlob) => {
+      if (nostalgistRef.current && netplayManager.role === 'client') {
+        await nostalgistRef.current.loadState(stateBlob);
+      }
+    };
+
+  }, [activeGame]);
 
   const handleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -105,9 +148,34 @@ export const Player = () => {
 
   const handleButtonDown = (btn: string) => {
     if (nostalgistRef.current) nostalgistRef.current.pressDown(mapButton(btn, activeGame?.system));
+    netplayManager.sendInput(btn, true);
   };
   const handleButtonUp = (btn: string) => {
     if (nostalgistRef.current) nostalgistRef.current.pressUp(mapButton(btn, activeGame?.system));
+    netplayManager.sendInput(btn, false);
+  };
+
+  const handleHostGame = async () => {
+    try {
+      setDebugLog('Generating Invite...');
+      const id = await netplayManager.hostGame();
+      setInviteId(id);
+      setDebugLog('Waiting for P2...');
+      
+      // When client connects, send ROM
+      netplayManager.onConnectionStatus = async (status) => {
+        setNetplayStatus(status);
+        if (status === 'Connected' && activeGameId) {
+          const buffer = await getRomBuffer(activeGameId);
+          if (buffer) {
+            netplayManager.sendRom(activeGame!.title, activeGame!.system, buffer);
+            setDebugLog('Sending ROM...');
+          }
+        }
+      };
+    } catch (e: any) {
+      setDebugLog('Error: ' + e.message);
+    }
   };
 
   return (
@@ -118,10 +186,13 @@ export const Player = () => {
           onClick={() => setIsSettingsOpen(true)}
           className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
         >
-          ⚙️ Настройки
+          ⚙️ Настройки {netplayStatus === 'Connected' && <span className="text-green-500 ml-1">● P2</span>}
         </button>
         <button 
-          onClick={stopGame}
+          onClick={() => {
+            netplayManager.disconnect();
+            stopGame();
+          }}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
         >
           Выйти
@@ -146,8 +217,6 @@ export const Player = () => {
         )}
       </div>
 
-      {/* Пока что Gamepad.tsx использует коды jsnes, это сломается. 
-          Надо переписать Gamepad.tsx на отправку строковых команд (up, down, a, b, start, select). */}
       <Gamepad 
         onButtonDown={handleButtonDown}
         onButtonUp={handleButtonUp}
@@ -157,9 +226,34 @@ export const Player = () => {
 
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold text-white text-center mb-2">Настройки</h2>
             
+            <div className="bg-gray-900 border border-blue-500/50 p-4 rounded-lg flex flex-col gap-2">
+              <h3 className="text-blue-400 font-bold">🌐 Мультиплеер (P2P)</h3>
+              {inviteId ? (
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">Отправь эту ссылку другу (или ID):</p>
+                  <input 
+                    readOnly 
+                    value={`${window.location.origin}${window.location.pathname}?join=${inviteId}`}
+                    className="w-full bg-black border border-gray-700 text-green-400 p-2 rounded text-xs mb-2"
+                    onClick={e => (e.target as HTMLInputElement).select()}
+                  />
+                  <div className="text-xs text-center text-gray-500">
+                    Статус: {netplayStatus || 'Ожидание P2...'}
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={handleHostGame}
+                  className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold w-full"
+                >
+                  👥 Пригласить друга
+                </button>
+              )}
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
                <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-md">
                  💾 Сохранить

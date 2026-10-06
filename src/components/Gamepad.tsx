@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 interface GamepadProps {
   onButtonDown: (btn: string) => void;
   onButtonUp: (btn: string) => void;
-  finalScale: number;
+  scale?: number;
   layout: 2 | 3 | 4 | 6;
   type?: 'analog' | 'dpad';
 }
@@ -285,6 +285,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, finalScale, layout, type = '
     </div>
   );
 };
+
 
 
 

@@ -1,5 +1,8 @@
-import { Peer } from 'peerjs';
-import type { DataConnection } from 'peerjs';
+import peerjsModule from 'peerjs';
+import type { DataConnection, Peer as PeerType } from 'peerjs';
+
+// Safe extraction for Vite/Rollup ESM/CJS interop
+const Peer = (peerjsModule as any).Peer || (peerjsModule as any).default || peerjsModule;
 
 export type NetplayMessage = 
   | { type: 'ROM'; title: string; system: string; buffer: ArrayBuffer }
@@ -17,7 +20,7 @@ const PEER_CONFIG = {
 };
 
 class NetplayManager {
-  peer: Peer | null = null;
+  peer: PeerType | null = null;
   conn: DataConnection | null = null;
   role: 'host' | 'client' | null = null;
   
@@ -31,11 +34,11 @@ class NetplayManager {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'host';
-      this.peer = new Peer(PEER_CONFIG);
-      this.peer.on('open', (id) => {
+      this.peer = new Peer(PEER_CONFIG) as PeerType;
+      this.peer.on('open', (id: string) => {
         resolve(id);
       });
-      this.peer.on('connection', (connection) => {
+      this.peer.on('connection', (connection: DataConnection) => {
         this.conn = connection;
         this.setupConnection();
       });
@@ -47,9 +50,10 @@ class NetplayManager {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'client';
-      this.peer = new Peer(PEER_CONFIG);
+      this.peer = new Peer(PEER_CONFIG) as PeerType;
       this.peer.on('open', () => {
-        this.conn = this.peer!.connect(hostId, { reliable: true });
+        if (!this.peer) return;
+        this.conn = this.peer.connect(hostId, { reliable: true });
         this.conn.on('open', () => {
           this.setupConnection();
           resolve();

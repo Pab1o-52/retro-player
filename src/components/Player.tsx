@@ -183,7 +183,8 @@ export const Player = () => {
         }
       };
     } catch (e: any) {
-      setDebugLog('Error: ' + e.message);
+      console.error(e);
+      setDebugLog('Error: ' + String(e.type || e.message || e));
     }
   };
 

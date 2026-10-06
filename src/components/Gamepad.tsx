@@ -204,7 +204,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         {type === 'analog' ? (
           <div 
             className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] flex items-center justify-center shrink-0 select-none border-2 border-dashed border-gray-700/50 rounded-full bg-gray-800/30 touch-none"
-            style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom left' }}
             onPointerDown={handleJoystickStart}
             onPointerMove={handleJoystickMove}
             onPointerUp={handleJoystickEnd}
@@ -238,23 +238,23 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         ) : (
           <div 
             className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none"
-            style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom left' }}
           >
             <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700">
               <button 
-                className="absolute top-0 w-10 h-12 bg-gray-400 rounded-t-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute top-0 w-10 h-12 bg-gray-400 rounded-t-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('up')} onPointerUp={handleEnd('up')} onPointerLeave={handleEnd('up')}
               />
               <button 
-                className="absolute bottom-0 w-10 h-12 bg-gray-400 rounded-b-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute bottom-0 w-10 h-12 bg-gray-400 rounded-b-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('down')} onPointerUp={handleEnd('down')} onPointerLeave={handleEnd('down')}
               />
               <button 
-                className="absolute left-0 w-12 h-10 bg-gray-400 rounded-l-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute left-0 w-12 h-10 bg-gray-400 rounded-l-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('left')} onPointerUp={handleEnd('left')} onPointerLeave={handleEnd('left')}
               />
               <button 
-                className="absolute right-0 w-12 h-10 bg-gray-400 rounded-r-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute right-0 w-12 h-10 bg-gray-400 rounded-r-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('right')} onPointerUp={handleEnd('right')} onPointerLeave={handleEnd('right')}
               />
               <div className="absolute w-10 h-10 bg-gray-500 rounded-sm pointer-events-none"></div>
@@ -285,7 +285,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
             </>
           )}
         {/* Экшн-кнопки */}
-        <div style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom right' }}>
+        <div style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom right' }}>
           {renderActionButtons()}
         </div>
 
@@ -293,6 +293,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     </div>
   );
 };
+
 
 
 

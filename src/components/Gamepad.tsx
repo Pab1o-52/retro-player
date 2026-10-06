@@ -203,7 +203,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
             onPointerCancel={handleJoystickEnd}
           >
             <span className="text-gray-600/50 font-bold text-center pointer-events-none px-4 text-sm">
-              Стик<br/>(тяните)
+Стик<br/>(тяните)
             </span>
 
             {joystickCenter && joystickThumb && (
@@ -253,6 +253,30 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
             </div>
           </div>
         )}
+        {/* Визуализация джойстика */}
+          {joystickCenter && joystickThumb && (
+            <>
+              {/* Основание стика */}
+              <div 
+                className="fixed bg-gray-800/90 border-4 border-gray-600 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] pointer-events-none z-50 backdrop-blur-sm"
+                style={{ 
+                  left: joystickCenter.x, top: joystickCenter.y, 
+                  width: `${100 * scale}px`, height: `${100 * scale}px`,
+                  transform: 'translate(-50%, -50%)' 
+                }}
+              />
+              {/* Сам ползунок */}
+              <div 
+                className="fixed bg-gradient-to-b from-blue-400 to-blue-600 rounded-full border-2 border-blue-300 pointer-events-none z-50 shadow-lg shadow-blue-500/50"
+                style={{ 
+                  left: joystickThumb.x, top: joystickThumb.y,
+                  width: `${50 * scale}px`, height: `${50 * scale}px`,
+                  transform: 'translate(-50%, -50%)' 
+                }}
+              />
+            </>
+          )}
+        {/* Экшн-кнопки */}
         <div style={{ transform: `scale(${scale})`, transformOrigin: 'bottom right' }}>
           {renderActionButtons()}
         </div>

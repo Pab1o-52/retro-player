@@ -29,6 +29,33 @@ export const Player = () => {
     return () => window.removeEventListener('keydown', handleMapKey);
   }, [mappingBtn, keyBinds]);
 
+  // Global Keyboard Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return; // Prevent spamming
+      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
+      if (entry) {
+        e.preventDefault(); // Prevent scrolling with arrow keys
+        handleButtonDown(entry[0]);
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
+      if (entry) {
+        e.preventDefault();
+        handleButtonUp(entry[0]);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('keyup', handleKeyUp, { passive: false });
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [keyBinds, activeGameId]);
 
   const activeGame = games.find(g => g.id === activeGameId);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -76,13 +103,12 @@ export const Player = () => {
             input_player2_right: 'h',
             
             // P1 Keyboard Map (ZXC = ABC, ASD = XYZ)
-            // Отключаем встроенную клавиатуру эмулятора, чтобы обрабатывать нажатия из React динамически
-            input_player1_y: 'nul',
-            input_player1_b: 'nul',
-            input_player1_a: 'nul',
-            input_player1_l: 'nul',
-            input_player1_x: 'nul',
-            input_player1_r: 'nul',
+            input_player1_y: 'nul', // Sega A
+            input_player1_b: 'nul', // Sega B
+            input_player1_a: 'nul', // Sega C
+            input_player1_l: 'nul', // Sega X
+            input_player1_x: 'nul', // Sega Y
+            input_player1_r: 'nul', // Sega Z
             input_player1_start: 'nul',
             input_player1_select: 'nul',
             input_player1_up: 'nul',
@@ -112,34 +138,6 @@ export const Player = () => {
       }
     };
   }, [activeGameId, activeGame]);
-
-  // Global Keyboard Listener
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Find which button is mapped to this physical key
-      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
-      if (entry) {
-        e.preventDefault(); // Prevent scrolling with arrow keys
-        handleButtonDown(entry[0]);
-      }
-    };
-    
-    const handleKeyUp = (e: KeyboardEvent) => {
-      const entry = Object.entries(keyBinds).find(([_btn, code]) => code === e.code);
-      if (entry) {
-        e.preventDefault();
-        handleButtonUp(entry[0]);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown, { passive: false });
-    window.addEventListener('keyup', handleKeyUp, { passive: false });
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [keyBinds, activeGameId]);
 
   useEffect(() => {
     netplayManager.onConnectionStatus = (status) => {
@@ -428,6 +426,24 @@ export const Player = () => {
                 <option value={4}>4 кнопки (A, B, X, Y)</option>
                 <option value={6}>6 кнопок (A, B, C, X, Y, Z)</option>
               </select>
+            </div>
+
+            <div className="w-full h-px bg-gray-700 my-2"></div>
+            
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-300 font-medium text-center">Настройка клавиатуры</label>
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                {Object.entries(keyBinds).map(([btn, code]) => (
+                  <button
+                    key={btn}
+                    onClick={() => setMappingBtn(btn)}
+                    className={`flex justify-between items-center px-3 py-2 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
+                  >
+                    <span className="uppercase font-bold">{btn}</span>
+                    <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? 'НАЖМИТЕ...' : code.replace('Key', '').replace('Arrow', '')}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="w-full h-px bg-gray-700 my-2"></div>

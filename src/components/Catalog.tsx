@@ -3,7 +3,7 @@ import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 
 export const Catalog = () => {
-  const { games, addGame, loadGames, removeGame, playGame,  } = useStore();
+  const { games, addGame, loadGames, removeGame, playGame } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [downloadingId, setDownloadingId] = useState<string | null>(null);

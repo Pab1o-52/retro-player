@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
 import { Gamepad } from './Gamepad';
 import { Nostalgist } from 'nostalgist';
@@ -21,7 +21,7 @@ export const Player = () => {
     let isCancelled = false;
 
     if (netplayManager.role === 'client') {
-      setDebugLog('РћР¶РёРґР°РЅРёРµ С‚СЂР°РЅСЃР»СЏС†РёРё РѕС‚ РҐРѕСЃС‚Р°...');
+      setDebugLog('Ожидание трансляции от Хоста...');
       netplayManager.sendReady();
       return;
     }
@@ -44,18 +44,18 @@ export const Player = () => {
             input_libretro_device_p1: 1,
             input_libretro_device_p2: 1,
             input_player2_joypad_index: 1,
-            input_player2_start: 'u',
-            input_player2_select: 'i',
-            input_player2_a: 'j',
-            input_player2_b: 'k',
-            input_player2_x: 'l',
-            input_player2_y: 'm',
-            input_player2_l: 'n',
-            input_player2_r: 'o',
-            input_player2_up: 't',
-            input_player2_down: 'g',
-            input_player2_left: 'f',
-            input_player2_right: 'h',
+            input_player2_start: 'num1',
+            input_player2_select: 'num2',
+            input_player2_a: 'num3',
+            input_player2_b: 'num4',
+            input_player2_x: 'num5',
+            input_player2_y: 'num6',
+            input_player2_l: 'num7',
+            input_player2_r: 'num8',
+            input_player2_up: 'w',
+            input_player2_down: 's',
+            input_player2_left: 'a',
+            input_player2_right: 'd',
           }
         });
 
@@ -92,9 +92,9 @@ export const Player = () => {
       // We map the button to the system
       const mapped = mapButton(btn, activeGame?.system);
       const playerIndex = netplayManager.role === 'host' ? 2 : 1; // if host, input is from p2. if client, input is from p1.
-        if (netplayManager.role === 'host') setDebugLog(`P2: ${btn} ${isDown ? 'DOWN' : 'UP'}`);
+      if (netplayManager.role === 'host') setDebugLog(P2:  );
         if (isDown) nostalgistRef.current.pressDown({ button: mapped, player: playerIndex });
-        else nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
+      else nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
     };
 
     netplayManager.onClientReady = async () => {
@@ -135,7 +135,7 @@ export const Player = () => {
       // Nostalgist saveState returns a Blob, which we can save to IndexedDB
       await saveGameState(activeGameId, state);
       setIsSettingsOpen(false);
-      setDebugLog('РЎРѕС…СЂР°РЅРµРЅРѕ!');
+      setDebugLog('Сохранено!');
       setTimeout(() => setDebugLog(''), 2000);
     }
   };
@@ -146,10 +146,10 @@ export const Player = () => {
       if (stateBlob) {
         await nostalgistRef.current.loadState(stateBlob.state); // nostalgist api
         setIsSettingsOpen(false);
-        setDebugLog('Р—Р°РіСЂСѓР¶РµРЅРѕ!');
+        setDebugLog('Загружено!');
         setTimeout(() => setDebugLog(''), 2000);
       } else {
-        setDebugLog('РќРµС‚ СЃРѕС…СЂР°РЅРµРЅРёР№!');
+        setDebugLog('Нет сохранений!');
         setTimeout(() => setDebugLog(''), 2000);
       }
     }
@@ -224,7 +224,7 @@ export const Player = () => {
           onClick={() => setIsSettingsOpen(true)}
           className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
         >
-          вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё {netplayStatus === 'Connected' && <span className="text-green-500 ml-1">в—Џ P2</span>}
+          ⚙️ Настройки {netplayStatus === 'Connected' && <span className="text-green-500 ml-1">● P2</span>}
         </button>
         <button 
           onClick={() => {
@@ -233,7 +233,7 @@ export const Player = () => {
           }}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
         >
-          Р’С‹Р№С‚Рё
+          Выйти
         </button>
       </div>
 
@@ -273,13 +273,13 @@ export const Player = () => {
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-white text-center mb-2">РќР°СЃС‚СЂРѕР№РєРё</h2>
+            <h2 className="text-2xl font-bold text-white text-center mb-2">Настройки</h2>
             
             <div className="bg-gray-900 border border-blue-500/50 p-4 rounded-lg flex flex-col gap-2">
-              <h3 className="text-blue-400 font-bold">рџЊђ РњСѓР»СЊС‚РёРїР»РµРµСЂ (P2P)</h3>
+              <h3 className="text-blue-400 font-bold">🌐 Мультиплеер (P2P)</h3>
               {inviteId ? (
                 <div>
-                  <p className="text-sm text-gray-400 mb-1">РћС‚РїСЂР°РІСЊ СЌС‚Сѓ СЃСЃС‹Р»РєСѓ РґСЂСѓРіСѓ (РёР»Рё ID):</p>
+                  <p className="text-sm text-gray-400 mb-1">Отправь эту ссылку другу (или ID):</p>
                   <input 
                     readOnly 
                     value={`${window.location.origin}${window.location.pathname}?join=${inviteId}`}
@@ -287,13 +287,13 @@ export const Player = () => {
                     onClick={e => (e.target as HTMLInputElement).select()}
                   />
                   <div className="text-xs text-center text-gray-500 mb-2">
-                    РЎС‚Р°С‚СѓСЃ: {netplayStatus || 'РћР¶РёРґР°РЅРёРµ P2...'}
+                    Статус: {netplayStatus || 'Ожидание P2...'}
                   </div>
                   {netplayStatus === 'Connected' && netplayManager.role === 'host' && (
                     <button 
                       onClick={async () => {
                         if (nostalgistRef.current) {
-                          setDebugLog('РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ...');
+                          setDebugLog('Синхронизация...');
                           const state = await nostalgistRef.current.saveState();
                           const buffer = await state.state.arrayBuffer();
                           netplayManager.sendSync(buffer);
@@ -303,7 +303,7 @@ export const Player = () => {
                       }}
                       className="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded font-bold w-full text-sm"
                     >
-                      рџ”„ РЎРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°С‚СЊ РёРіСЂСѓ
+                      🔄 Синхронизировать игру
                     </button>
                   )}
                 </div>
@@ -312,24 +312,24 @@ export const Player = () => {
                   onClick={handleHostGame}
                   className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold w-full"
                 >
-                  рџ‘Ґ РџСЂРёРіР»Р°СЃРёС‚СЊ РґСЂСѓРіР°
+                  👥 Пригласить друга
                 </button>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-md">
-                 рџ’ѕ РЎРѕС…СЂР°РЅРёС‚СЊ
+                 💾 Сохранить
                </button>
                <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md">
-                 рџ“‚ Р—Р°РіСЂСѓР·РёС‚СЊ
+                 📂 Загрузить
                </button>
             </div>
 
             <div className="w-full h-px bg-gray-700 my-2"></div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-gray-300 font-medium">Р Р°Р·РјРµСЂ РґР¶РѕР№СЃС‚РёРєР°: {Math.round(joystickScale * 100)}%</label>
+              <label className="text-gray-300 font-medium">Размер джойстика: {Math.round(joystickScale * 100)}%</label>
               <input 
                 type="range" 
                 min="0.5" max="2" step="0.1" 
@@ -340,16 +340,16 @@ export const Player = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-gray-300 font-medium">РљРѕР»РёС‡РµСЃС‚РІРѕ РєРЅРѕРїРѕРє</label>
+              <label className="text-gray-300 font-medium">Количество кнопок</label>
               <select 
                 value={buttonLayout}
                 onChange={(e) => setButtonLayout(parseInt(e.target.value) as 2|3|4|6)}
                 className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500"
               >
-                <option value={2}>2 РєРЅРѕРїРєРё (A, B)</option>
-                <option value={3}>3 РєРЅРѕРїРєРё (A, B, C)</option>
-                <option value={4}>4 РєРЅРѕРїРєРё (A, B, X, Y)</option>
-                <option value={6}>6 РєРЅРѕРїРѕРє (A, B, C, X, Y, Z)</option>
+                <option value={2}>2 кнопки (A, B)</option>
+                <option value={3}>3 кнопки (A, B, C)</option>
+                <option value={4}>4 кнопки (A, B, X, Y)</option>
+                <option value={6}>6 кнопок (A, B, C, X, Y, Z)</option>
               </select>
             </div>
 
@@ -359,14 +359,14 @@ export const Player = () => {
               onClick={handleFullScreen}
               className="bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold transition-colors"
             >
-              рџ–Ґ Full Screen
+              🖥 Full Screen
             </button>
 
             <button 
               onClick={() => setIsSettingsOpen(false)}
               className="bg-red-600 hover:bg-red-500 text-white py-3 rounded-lg font-bold transition-colors mt-2"
             >
-              Р—Р°РєСЂС‹С‚СЊ
+              Закрыть
             </button>
           </div>
         </div>
@@ -374,6 +374,4 @@ export const Player = () => {
     </div>
   );
 };
-
-
 

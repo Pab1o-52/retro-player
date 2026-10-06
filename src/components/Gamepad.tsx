@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 
 interface GamepadProps {
   onButtonDown: (btn: string) => void;
   onButtonUp: (btn: string) => void;
-  scale: number;
+  finalScale: number;
   layout: 2 | 3 | 4 | 6;
   type?: 'analog' | 'dpad';
 }
@@ -14,7 +14,7 @@ interface Point {
   y: number;
 }
 
-export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analog' }: GamepadProps) => {
+export const Gamepad = ({ onButtonDown, onButtonUp, finalScale, layout, type = 'analog' }: GamepadProps) => {
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
@@ -54,7 +54,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
     const dx = e.clientX - joystickCenter.x;
     const dy = e.clientY - joystickCenter.y;
     
-    const maxRadius = 50 * scale;
+    const maxRadius = 50 * finalScale;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
     let thumbX = e.clientX;
@@ -68,7 +68,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
     
     setJoystickThumb({ x: thumbX, y: thumbY });
 
-    const deadzone = 15 * scale;
+    const deadzone = 15 * finalScale;
     const newActive = new Set<string>();
 
     if (distance > deadzone) {
@@ -196,7 +196,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
         {type === 'analog' ? (
           <div 
             className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] flex items-center justify-center shrink-0 select-none border-2 border-dashed border-gray-700/50 rounded-full bg-gray-800/30 touch-none"
-            style={{ transform: `scale(${scale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom left' }}
             onPointerDown={handleJoystickStart}
             onPointerMove={handleJoystickMove}
             onPointerUp={handleJoystickEnd}
@@ -212,7 +212,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
                   className="fixed bg-gray-800/90 border-4 border-gray-600 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] pointer-events-none z-50 backdrop-blur-sm"
                   style={{ 
                     left: joystickCenter.x, top: joystickCenter.y, 
-                    width: `${100 * scale}px`, height: `${100 * scale}px`,
+                    width: `${100 * finalScale}px`, height: `${100 * finalScale}px`,
                     transform: 'translate(-50%, -50%)' 
                   }}
                 />
@@ -220,7 +220,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
                   className="fixed bg-gradient-to-b from-blue-400 to-blue-600 rounded-full border-2 border-blue-300 pointer-events-none z-50 shadow-lg shadow-blue-500/50"
                   style={{ 
                     left: joystickThumb.x, top: joystickThumb.y,
-                    width: `${50 * scale}px`, height: `${50 * scale}px`,
+                    width: `${50 * finalScale}px`, height: `${50 * finalScale}px`,
                     transform: 'translate(-50%, -50%)' 
                   }}
                 />
@@ -230,23 +230,23 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
         ) : (
           <div 
             className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none"
-            style={{ transform: `scale(${scale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom left' }}
           >
             <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700">
               <button 
-                className="absolute top-0 w-10 h-12 bg-gray-400 rounded-t-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute top-0 w-10 h-12 bg-gray-400 rounded-t-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('up')} onPointerUp={handleEnd('up')} onPointerLeave={handleEnd('up')}
               />
               <button 
-                className="absolute bottom-0 w-10 h-12 bg-gray-400 rounded-b-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute bottom-0 w-10 h-12 bg-gray-400 rounded-b-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('down')} onPointerUp={handleEnd('down')} onPointerLeave={handleEnd('down')}
               />
               <button 
-                className="absolute left-0 w-12 h-10 bg-gray-400 rounded-l-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute left-0 w-12 h-10 bg-gray-400 rounded-l-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('left')} onPointerUp={handleEnd('left')} onPointerLeave={handleEnd('left')}
               />
               <button 
-                className="absolute right-0 w-12 h-10 bg-gray-400 rounded-r-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
+                className="absolute right-0 w-12 h-10 bg-gray-400 rounded-r-lg active:bg-gray-500 active:finalScale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
                 onPointerDown={handleStart('right')} onPointerUp={handleEnd('right')} onPointerLeave={handleEnd('right')}
               />
               <div className="absolute w-10 h-10 bg-gray-500 rounded-sm pointer-events-none"></div>
@@ -261,7 +261,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
                 className="fixed bg-gray-800/90 border-4 border-gray-600 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] pointer-events-none z-50 backdrop-blur-sm"
                 style={{ 
                   left: joystickCenter.x, top: joystickCenter.y, 
-                  width: `${100 * scale}px`, height: `${100 * scale}px`,
+                  width: `${100 * finalScale}px`, height: `${100 * finalScale}px`,
                   transform: 'translate(-50%, -50%)' 
                 }}
               />
@@ -270,14 +270,14 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
                 className="fixed bg-gradient-to-b from-blue-400 to-blue-600 rounded-full border-2 border-blue-300 pointer-events-none z-50 shadow-lg shadow-blue-500/50"
                 style={{ 
                   left: joystickThumb.x, top: joystickThumb.y,
-                  width: `${50 * scale}px`, height: `${50 * scale}px`,
+                  width: `${50 * finalScale}px`, height: `${50 * finalScale}px`,
                   transform: 'translate(-50%, -50%)' 
                 }}
               />
             </>
           )}
         {/* Экшн-кнопки */}
-        <div style={{ transform: `scale(${scale})`, transformOrigin: 'bottom right' }}>
+        <div style={{ transform: `finalScale(${finalScale})`, transformOrigin: 'bottom right' }}>
           {renderActionButtons()}
         </div>
 
@@ -285,4 +285,6 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale, layout, type = 'analo
     </div>
   );
 };
+
+
 

@@ -92,7 +92,7 @@ export const Player = () => {
       // We map the button to the system
       const mapped = mapButton(btn, activeGame?.system);
       const playerIndex = netplayManager.role === 'host' ? 2 : 1; // if host, input is from p2. if client, input is from p1.
-      if (netplayManager.role === 'host') setDebugLog(P2:  );
+      if (netplayManager.role === 'host') setDebugLog(`P2: ${btn} ${isDown ? "DOWN" : "UP"}`);
         if (isDown) nostalgistRef.current.pressDown({ button: mapped, player: playerIndex });
       else nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
     };

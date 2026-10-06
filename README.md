@@ -1,37 +1,49 @@
-# Retro Player
+﻿# 🎮 Retro Player
 
-?? **������ ������:** [https://Pab1o-52.github.io/retro-player/](https://Pab1o-52.github.io/retro-player/)
+[![Deploy Status](https://img.shields.io/badge/Deploy-GitHub_Pages-success)](https://Pab1o-52.github.io/retro-player/)
 
-# React + TypeScript + Vite
+**Retro Player** — это современный браузерный эмулятор консолей Sega Mega Drive и NES (Dendy), написанный на React и TypeScript с использованием WebAssembly-ядра Nostalgist.js. Эмулятор поддерживает локальное сохранение игр (IndexedDB), полностью настраиваемое сенсорное управление для смартфонов и, самое главное — **сетевую игру (Netplay)** через WebRTC (PeerJS) с поддержкой облачного гейминга для второго игрока!
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+🌐 **Играть онлайн:** [https://Pab1o-52.github.io/retro-player/](https://Pab1o-52.github.io/retro-player/)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Главные возможности
 
-## React Compiler
+* **👾 Два движка:** Поддержка игр от Sega Genesis / Mega Drive (`.md`, `.gen`, `.smd`, `.bin`) и Nintendo / Dendy (`.nes`).
+* **💾 Офлайн-библиотека:** Загруженные игры и сохранения (Save States) навсегда остаются в вашем браузере (через IndexedDB). Никаких серверов и баз данных — всё хранится только у вас на устройстве!
+* **📱 Оптимизировано для мобильных:** 
+  * Плавающий "аналоговый" 3D-джойстик (тап и тяни).
+  * Настраиваемый размер и прозрачность кнопок.
+  * Виброотклик (Haptic Feedback) при нажатиях.
+  * Выбор раскладки (2, 3, 4 или 6 кнопок).
+* **⌨️ Поддержка клавиатуры (ПК):** Полная поддержка управления с физической клавиатуры (WASD, Стрелочки, Enter, Shift, Z X C / A S D).
+* **🌐 Сетевой мультиплеер (WebRTC P2P):** 
+  * Генерируйте ссылку и отправляйте другу.
+  * **Zero Lag Cloud Gaming:** Друг подключается к вам, мгновенно получая видеопоток с вашего экрана и отправляя вам нажатия своих кнопок. Игра работает на вашем устройстве, обеспечивая 100% синхронизацию без рассинхронов!
+  * **Авто-сохранение игр:** При подключении к сетевой игре друг автоматически и незаметно скачивает саму игру себе в кэш браузера, чтобы позже играть в неё локально.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Технологии
 
-## Expanding the Oxlint configuration
+* **Frontend:** React, TypeScript, Vite
+* **Стилизация:** Tailwind CSS
+* **Состояние и БД:** Zustand, LocalForage (IndexedDB)
+* **Эмуляция:** [Nostalgist.js](https://github.com/retroarch-web/nostalgist.js) (оболочка для WebAssembly-ядер RetroArch: `fceumm` и `genesis_plus_gx`)
+* **Сеть:** PeerJS (WebRTC DataChannels + MediaStream)
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 🚀 Как запустить локально
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+1. Склонируйте репозиторий:
+   ```bash
+   git clone https://github.com/Pab1o-52/retro-player.git
+   ```
+2. Установите зависимости:
+   ```bash
+   npm install
+   ```
+3. Запустите сервер для разработки:
+   ```bash
+   npm run dev
+   ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
-
+> ⚠️ **Внимание:** Сетевая игра и генерация UUID требуют безопасного контекста (HTTPS или `localhost`).

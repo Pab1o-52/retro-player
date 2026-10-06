@@ -69,7 +69,9 @@ class NetplayManager {
         
         this.peer.on('connection', (connection: DataConnection) => {
           this.conn = connection;
-          this.setupConnection();
+          this.conn.on('open', () => {
+            this.setupConnection();
+          });
         });
         
         this.peer.on('error', (err: any) => {

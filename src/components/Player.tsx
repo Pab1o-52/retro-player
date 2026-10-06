@@ -4,6 +4,11 @@ import { Gamepad } from './Gamepad';
 import { Nostalgist } from 'nostalgist';
 import { netplayManager } from '../lib/multiplayer/NetplayManager';
 
+// Force Emscripten to always accept keyboard events even if window loses focus
+try {
+  Object.defineProperty(document, 'hasFocus', { get: () => () => true });
+} catch (e) {}
+
 export const Player = () => {
   const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, netplayStatus, setNetplayStatus } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,6 +45,9 @@ export const Player = () => {
           rom: buffer,
           element: canvasRef.current!,
           retroarchConfig: {
+              input_libretro_device_p1: 1,
+              input_libretro_device_p2: 1,
+              input_player2_joypad_index: 1,
               pause_nonactive: false,
             input_libretro_device_p1: 1,
             input_libretro_device_p2: 1,

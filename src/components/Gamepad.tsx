@@ -15,6 +15,14 @@ interface Point {
 }
 
 export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type = 'analog' }: GamepadProps) => {
+  const [isLandscape, setIsLandscape] = useState(false);
+  useEffect(() => {
+    const checkOrientation = () => setIsLandscape(window.innerWidth > window.innerHeight);
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    return () => window.removeEventListener('resize', checkOrientation);
+  }, []);
+  const finalScale = scale * (isLandscape ? 0.6 : 0.9);
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
@@ -285,6 +293,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     </div>
   );
 };
+
 
 
 

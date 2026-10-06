@@ -174,7 +174,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-4 mt-auto landscape:absolute landscape:bottom-6 landscape:left-0 landscape:right-0 landscape:z-[60] landscape:opacity-60 landscape:px-12" style={{ touchAction: 'none' }}>
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-4 mt-auto landscape:absolute landscape:bottom-0 landscape:left-0 landscape:right-0 landscape:z-[60] landscape:opacity-60 landscape:px-12" style={{ touchAction: 'none' }}>
       
       {/* Кнопки Select / Start */}
       <div className="flex gap-6 justify-center shrink-0">
@@ -198,7 +198,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         </div>
       </div>
 
-      <div className="flex flex-row justify-between items-end pb-8">
+      <div className="flex flex-row justify-between items-end pb-8 landscape:pb-2">
         
         {/* Зона плавающего джойстика */}
         {type === 'analog' ? (
@@ -293,6 +293,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     </div>
   );
 };
+
 
 
 

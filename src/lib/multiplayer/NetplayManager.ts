@@ -2,10 +2,19 @@ import { Peer } from 'peerjs';
 import type { DataConnection } from 'peerjs';
 
 export type NetplayMessage = 
-  | { type: 'ROM'; title: string; system: string; blob: Blob }
+  | { type: 'ROM'; title: string; system: string; buffer: ArrayBuffer }
   | { type: 'READY' }
   | { type: 'INPUT'; btn: string; isDown: boolean }
-  | { type: 'SYNC'; state: Blob };
+  | { type: 'SYNC'; state: ArrayBuffer };
+
+const PEER_CONFIG = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ]
+  }
+};
 
 class NetplayManager {
   peer: Peer | null = null;
@@ -15,14 +24,14 @@ class NetplayManager {
   onRomReceived?: (title: string, system: string, buffer: ArrayBuffer) => void;
   onClientReady?: () => void;
   onInputReceived?: (btn: string, isDown: boolean) => void;
-  onSyncReceived?: (state: Blob) => void;
+  onSyncReceived?: (state: ArrayBuffer) => void;
   onConnectionStatus?: (status: string) => void;
 
   hostGame(): Promise<string> {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'host';
-      this.peer = new Peer();
+      this.peer = new Peer(PEER_CONFIG);
       this.peer.on('open', (id) => {
         resolve(id);
       });
@@ -38,7 +47,7 @@ class NetplayManager {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'client';
-      this.peer = new Peer();
+      this.peer = new Peer(PEER_CONFIG);
       this.peer.on('open', () => {
         this.conn = this.peer!.connect(hostId, { reliable: true });
         this.conn.on('open', () => {
@@ -59,8 +68,7 @@ class NetplayManager {
       const msg = data as NetplayMessage;
       
       if (msg.type === 'ROM') {
-        const buffer = await msg.blob.arrayBuffer();
-        this.onRomReceived?.(msg.title, msg.system, buffer);
+        this.onRomReceived?.(msg.title, msg.system, msg.buffer);
       } else if (msg.type === 'READY') {
         this.onClientReady?.();
       } else if (msg.type === 'INPUT') {
@@ -78,7 +86,7 @@ class NetplayManager {
 
   sendRom(title: string, system: string, buffer: ArrayBuffer) {
     if (this.conn && this.role === 'host') {
-      this.conn.send({ type: 'ROM', title, system, blob: new Blob([buffer]) });
+      this.conn.send({ type: 'ROM', title, system, buffer });
     }
   }
 
@@ -94,7 +102,7 @@ class NetplayManager {
     }
   }
 
-  sendSync(state: Blob) {
+  sendSync(state: ArrayBuffer) {
     if (this.conn && this.role === 'host') {
       this.conn.send({ type: 'SYNC', state });
     }

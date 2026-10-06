@@ -82,16 +82,25 @@ export const Player = () => {
       if (netplayManager.role === 'host') {
         syncInterval.current = setInterval(async () => {
           if (nostalgistRef.current) {
-            const state = await nostalgistRef.current.saveState();
-            netplayManager.sendSync(state.state);
+            try {
+              const state = await nostalgistRef.current.saveState();
+              const buffer = await state.state.arrayBuffer();
+              netplayManager.sendSync(buffer);
+            } catch (e) {
+              console.error('Failed to sync state', e);
+            }
           }
         }, 5000);
       }
     };
 
-    netplayManager.onSyncReceived = async (stateBlob) => {
+    netplayManager.onSyncReceived = async (stateBuffer) => {
       if (nostalgistRef.current && netplayManager.role === 'client') {
-        await nostalgistRef.current.loadState(stateBlob);
+        try {
+          await nostalgistRef.current.loadState(new Blob([stateBuffer]));
+        } catch (e) {
+          console.error('Failed to load state', e);
+        }
       }
     };
 

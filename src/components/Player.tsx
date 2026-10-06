@@ -202,8 +202,9 @@ export const Player = () => {
       
       // When client connects, send ROM
       netplayManager.onConnectionStatus = async (status) => {
-        setNetplayStatus(status);
-        if (status === 'Connected' && activeGameId) {
+          setNetplayStatus(status);
+          if (status === 'Connected' && activeGameId) {
+            setIsSettingsOpen(false); // Auto-close settings for Host when P2 joins
           const buffer = await getRomBuffer(activeGameId);
           if (buffer) {
             netplayManager.sendRom(activeGame!.title, activeGame!.system, buffer); // Send actual ROM so client saves it

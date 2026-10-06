@@ -14,7 +14,7 @@ interface Point {
   y: number;
 }
 
-export const Gamepad = ({ onButtonDown, onButtonUp, finalScale, layout, type = 'analog' }: GamepadProps) => {
+export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type = 'analog' }: GamepadProps) => {
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
@@ -285,6 +285,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, finalScale, layout, type = '
     </div>
   );
 };
+
 
 
 

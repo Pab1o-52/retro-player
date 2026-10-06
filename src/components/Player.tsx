@@ -77,8 +77,17 @@ export const Player = () => {
       else nostalgistRef.current.pressUp({ button: mapped, player: playerIndex });
     };
 
-    netplayManager.onClientReady = () => {
-      // Disabled auto-sync because it causes severe lag
+    netplayManager.onClientReady = async () => {
+      // Send ONE initial save state to sync up the client
+      if (netplayManager.role === 'host' && nostalgistRef.current) {
+        try {
+          const state = await nostalgistRef.current.saveState();
+          const buffer = await state.state.arrayBuffer();
+          netplayManager.sendSync(buffer);
+        } catch (e) {
+          console.error('Failed to send initial sync', e);
+        }
+      }
     };
 
     netplayManager.onSyncReceived = async (stateBuffer) => {

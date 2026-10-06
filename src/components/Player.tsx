@@ -4,7 +4,7 @@ import { Gamepad } from './Gamepad';
 import { Nostalgist } from 'nostalgist';
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -138,6 +138,8 @@ export const Player = () => {
       <Gamepad 
         onButtonDown={handleButtonDown}
         onButtonUp={handleButtonUp}
+        scale={joystickScale}
+        layout={buttonLayout}
       />
 
       {isSettingsOpen && (
@@ -152,6 +154,33 @@ export const Player = () => {
                <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md">
                  📂 Загрузить
                </button>
+            </div>
+
+            <div className="w-full h-px bg-gray-700 my-2"></div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-300 font-medium">Размер джойстика: {Math.round(joystickScale * 100)}%</label>
+              <input 
+                type="range" 
+                min="0.5" max="2" step="0.1" 
+                value={joystickScale} 
+                onChange={(e) => setJoystickScale(parseFloat(e.target.value))}
+                className="w-full accent-blue-500" 
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-gray-300 font-medium">Количество кнопок</label>
+              <select 
+                value={buttonLayout}
+                onChange={(e) => setButtonLayout(parseInt(e.target.value) as 2|3|4|6)}
+                className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500"
+              >
+                <option value={2}>2 кнопки (A, B)</option>
+                <option value={3}>3 кнопки (A, B, C)</option>
+                <option value={4}>4 кнопки (A, B, X, Y)</option>
+                <option value={6}>6 кнопок (A, B, C, X, Y, Z)</option>
+              </select>
             </div>
 
             <div className="w-full h-px bg-gray-700 my-2"></div>

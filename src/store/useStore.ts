@@ -24,6 +24,10 @@ interface EmulatorState {
   removeGame: (id: string) => Promise<void>;
   saveGameState: (id: string, stateData: any) => Promise<void>;
   loadGameState: (id: string) => Promise<any | null>;
+  joystickScale: number;
+  setJoystickScale: (scale: number) => void;
+  buttonLayout: 2 | 3 | 4 | 6;
+  setButtonLayout: (layout: 2 | 3 | 4 | 6) => void;
 }
 
 export const useStore = create<EmulatorState>((set, get) => ({
@@ -63,7 +67,11 @@ export const useStore = create<EmulatorState>((set, get) => ({
   },
   loadGameState: async (id) => {
     return await localforage.getItem(`save_${id}`);
-  }
+  },
+  joystickScale: 1,
+  setJoystickScale: (scale) => set({ joystickScale: scale }),
+  buttonLayout: 6,
+  setButtonLayout: (layout) => set({ buttonLayout: layout })
 }));
 
 

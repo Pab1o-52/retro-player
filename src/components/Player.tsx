@@ -14,6 +14,7 @@ export const Player = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isKeyboardSettingsOpen, setIsKeyboardSettingsOpen] = useState(false);
   const [debugLog, setDebugLog] = useState<string>('');
   const [inviteId, setInviteId] = useState<string>('');
   const [mappingBtn, setMappingBtn] = useState<string | null>(null);
@@ -279,19 +280,29 @@ export const Player = () => {
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]">
       
-      <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2">
+      <div className="w-full max-w-3xl mx-auto flex justify-between items-center mb-4 px-2 gap-2">
         <button 
           onClick={() => setIsSettingsOpen(true)}
-          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
+          className="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-bold transition-colors shadow whitespace-nowrap text-sm sm:text-base"
         >
           ⚙️ Настройки {netplayStatus === 'Connected' && <span className="text-green-500 ml-1">● P2</span>}
         </button>
+
+        <div className="flex gap-2 flex-1 justify-center">
+          <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold shadow text-xs sm:text-sm whitespace-nowrap">
+            💾 Сохранить
+          </button>
+          <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-bold shadow text-xs sm:text-sm whitespace-nowrap">
+            📂 Загрузить
+          </button>
+        </div>
+
         <button 
           onClick={() => {
             netplayManager.disconnect();
             stopGame();
           }}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow"
+          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold transition-colors shadow whitespace-nowrap text-sm sm:text-base"
         >
           Выйти
         </button>
@@ -377,15 +388,6 @@ export const Player = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-               <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold shadow-md">
-                 💾 Сохранить
-               </button>
-               <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold shadow-md">
-                 📂 Загрузить
-               </button>
-            </div>
-
             <div className="w-full h-px bg-gray-700 my-2"></div>
 
             <div className="flex flex-col gap-2">
@@ -430,21 +432,12 @@ export const Player = () => {
 
             <div className="w-full h-px bg-gray-700 my-2"></div>
             
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-300 font-medium text-center">Настройка клавиатуры</label>
-              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
-                {Object.entries(keyBinds).map(([btn, code]) => (
-                  <button
-                    key={btn}
-                    onClick={() => setMappingBtn(btn)}
-                    className={`flex justify-between items-center px-3 py-2 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
-                  >
-                    <span className="uppercase font-bold">{btn}</span>
-                    <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? 'НАЖМИТЕ...' : code.replace('Key', '').replace('Arrow', '')}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <button 
+              onClick={() => { setIsSettingsOpen(false); setIsKeyboardSettingsOpen(true); }}
+              className="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-bold shadow-md w-full"
+            >
+              ⌨️ Настроить клавиатуру
+            </button>
 
             <div className="w-full h-px bg-gray-700 my-2"></div>
 
@@ -460,6 +453,34 @@ export const Player = () => {
               className="bg-red-600 hover:bg-red-500 text-white py-3 rounded-lg font-bold transition-colors mt-2"
             >
               Закрыть
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isKeyboardSettingsOpen && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
+            <h2 className="text-xl font-bold text-white text-center mb-2 flex items-center justify-center gap-2">
+              ⌨️ Настройка клавиатуры
+            </h2>
+            <div className="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto pr-1">
+              {Object.entries(keyBinds).map(([btn, code]) => (
+                <button
+                  key={btn}
+                  onClick={() => setMappingBtn(btn)}
+                  className={`flex justify-between items-center px-3 py-3 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
+                >
+                  <span className="uppercase font-bold">{btn}</span>
+                  <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? 'НАЖМИТЕ...' : code.replace('Key', '').replace('Arrow', '')}</span>
+                </button>
+              ))}
+            </div>
+            <button 
+              onClick={() => { setIsKeyboardSettingsOpen(false); setIsSettingsOpen(true); }}
+              className="bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg font-bold transition-colors mt-2 w-full"
+            >
+              Назад в настройки
             </button>
           </div>
         </div>

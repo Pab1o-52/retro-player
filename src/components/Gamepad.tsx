@@ -22,7 +22,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     window.addEventListener('resize', checkOrientation);
     return () => window.removeEventListener('resize', checkOrientation);
   }, []);
-  const finalScale = scale * (isLandscape ? 0.6 : 0.9);
+  const finalScale = scale * (isLandscape ? 0.7 : 0.9);
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
@@ -198,7 +198,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         </div>
       </div>
 
-      <div className="flex flex-row justify-between items-end pb-8 landscape:pb-4">
+      <div className="flex flex-row justify-between items-end pb-8 landscape:pb-4 pr-6 landscape:pr-0">
         
         {/* Зона плавающего джойстика */}
         {type === 'analog' ? (
@@ -293,6 +293,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     </div>
   );
 };
+
 
 
 

@@ -82,12 +82,28 @@ export const useStore = create<EmulatorState>((set, get) => ({
   netplayStatus: null,
   setNetplayStatus: (status) => set({ netplayStatus: status }),
   netplayGameBuffer: null,
-  setNetplayGame: (title, system, buffer) => {
-    // Add temporary game to list if not there
-    const tempGame = { id: 'netplay-guest', title, system, addedAt: Date.now() };
-    const games = get().games.filter(g => g.id !== 'netplay-guest');
-    set({ games: [tempGame, ...games], netplayGameBuffer: buffer, activeGameId: 'netplay-guest' });
-  }
+  setNetplayGame: async (title, system, buffer) => {
+      let catalog = await localforage.getItem<Game[]>('catalog') || [];
+      let existing = catalog.find(g => g.title === title && g.system === system);
+      let gameId = existing?.id;
+      
+      if (!gameId) {
+        gameId = crypto.randomUUID();
+        await localforage.setItem(`rom_${gameId}`, buffer);
+        const newGame = {
+          id: gameId,
+          title,
+          addedAt: Date.now(),
+          system
+        };
+        catalog = [newGame, ...catalog];
+        await localforage.setItem('catalog', catalog);
+      } else {
+        await localforage.setItem(`rom_${gameId}`, buffer);
+      }
+      
+      set({ games: catalog, activeGameId: gameId });
+    }
 }));
 
 

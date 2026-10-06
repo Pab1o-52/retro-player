@@ -29,6 +29,7 @@ class NetplayManager {
   onSyncReceived?: (state: ArrayBuffer) => void;
   onConnectionStatus?: (status: string) => void;
   onVideoStream?: (stream: MediaStream) => void;
+  cachedStream: MediaStream | null = null;
 
   private tryCreatePeer(serverIndex: number): Promise<[Peer, number]> {
     return new Promise((resolve, reject) => {
@@ -111,6 +112,7 @@ class NetplayManager {
       this.peer.on('call', (call) => {
         call.answer(); // Answer without our own stream
         call.on('stream', (remoteStream) => {
+          this.cachedStream = remoteStream;
           if (this.onVideoStream) {
             this.onVideoStream(remoteStream);
           }

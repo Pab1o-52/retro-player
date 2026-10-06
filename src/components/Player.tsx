@@ -97,6 +97,9 @@ export const Player = () => {
         setDebugLog('');
       }
     };
+    if (netplayManager.cachedStream) {
+      netplayManager.onVideoStream(netplayManager.cachedStream);
+    }
   }, [activeGame]);
 
   const handleFullScreen = () => {
@@ -179,7 +182,7 @@ export const Player = () => {
         if (status === 'Connected' && activeGameId) {
           const buffer = await getRomBuffer(activeGameId);
           if (buffer) {
-            netplayManager.sendRom(activeGame!.title, activeGame!.system, buffer);
+            netplayManager.sendRom(activeGame!.title, activeGame!.system, new ArrayBuffer(0)); // Empty buffer for cloud gaming
             setDebugLog('Sending ROM...');
           }
             const stream = (canvasRef.current as any)?.captureStream(30);

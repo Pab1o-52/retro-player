@@ -28,6 +28,7 @@ class NetplayManager {
   onInputReceived?: (btn: string, isDown: boolean) => void;
   onSyncReceived?: (state: ArrayBuffer) => void;
   onConnectionStatus?: (status: string) => void;
+  onVideoStream?: (stream: MediaStream) => void;
 
   private tryCreatePeer(serverIndex: number): Promise<[Peer, number]> {
     return new Promise((resolve, reject) => {
@@ -58,7 +59,7 @@ class NetplayManager {
     });
   }
 
-  hostGame(): Promise<string> {
+  hostGame(canvasStream?: MediaStream): Promise<string> {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'host';
@@ -71,6 +72,11 @@ class NetplayManager {
           this.conn = connection;
           this.conn.on('open', () => {
             this.setupConnection();
+            
+            // Initiate Video Call
+            if (canvasStream) {
+              this.peer!.call(connection.peer, canvasStream);
+            }
           });
         });
         
@@ -100,6 +106,16 @@ class NetplayManager {
 
       const config = { ...PEER_SERVERS[serverIndex], config: ICE_CONFIG };
       this.peer = new Peer(config);
+      
+      this.peer.on('call', (call) => {
+        call.answer(); // Answer without our own stream
+        call.on('stream', (remoteStream) => {
+          if (this.onVideoStream) {
+            this.onVideoStream(remoteStream);
+          }
+        });
+      });
+
       this.peer.on('open', () => {
         if (!this.peer) return;
         this.conn = this.peer.connect(hostId, { reliable: true });

@@ -13,12 +13,20 @@ export const Player = () => {
   const [inviteId, setInviteId] = useState<string>('');
 
   const activeGame = games.find(g => g.id === activeGameId);
-  const syncInterval = useRef<any>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!activeGameId || !canvasRef.current || !activeGame) return;
+    if (!activeGameId || !activeGame) return;
     
     let isCancelled = false;
+
+    if (netplayManager.role === 'client') {
+      setDebugLog('Ожидание трансляции от Хоста...');
+      netplayManager.sendReady();
+      return;
+    }
+
+    if (!canvasRef.current) return;
     setDebugLog('Loading Emulator Core (WASM)...');
 
     getRomBuffer(activeGameId).then(async (buffer) => {
@@ -40,12 +48,6 @@ export const Player = () => {
 
         nostalgistRef.current = nostalgist;
         setDebugLog('');
-
-        // If client, we are ready!
-        if (netplayManager.role === 'client') {
-          netplayManager.sendReady();
-        }
-
       } catch (err: any) {
         setDebugLog('Core Crash: ' + err.message);
       }
@@ -90,18 +92,12 @@ export const Player = () => {
       }
     };
 
-    netplayManager.onSyncReceived = async (stateBuffer) => {
-      if (nostalgistRef.current && netplayManager.role === 'client') {
-        try {
-          setDebugLog('Синхронизация...');
-          await nostalgistRef.current.loadState(new Blob([stateBuffer]));
-          setTimeout(() => setDebugLog(''), 2000);
-        } catch (e) {
-          console.error('Failed to load state', e);
-        }
+    netplayManager.onVideoStream = (stream) => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setDebugLog('');
       }
     };
-
   }, [activeGame]);
 
   const handleFullScreen = () => {
@@ -174,7 +170,8 @@ export const Player = () => {
   const handleHostGame = async () => {
     try {
       setDebugLog('Generating Invite...');
-      const id = await netplayManager.hostGame();
+      const stream = (canvasRef.current as any)?.captureStream(30);
+      const id = await netplayManager.hostGame(stream);
       setInviteId(id);
       setDebugLog('Waiting for P2...');
       
@@ -222,7 +219,14 @@ export const Player = () => {
         <canvas 
           ref={canvasRef} 
           className="w-full h-full object-contain relative z-0"
-          style={{ imageRendering: 'pixelated' }}
+          style={{ imageRendering: 'pixelated', display: netplayManager.role === 'client' ? 'none' : 'block' }}
+        />
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className="w-full h-full object-contain relative z-0"
+          style={{ display: netplayManager.role === 'client' ? 'block' : 'none' }}
         />
 
         {debugLog && (

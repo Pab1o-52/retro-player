@@ -13,10 +13,7 @@ export const Catalog = () => {
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
   }, []);
 
-  useEffect(() => {
-    if (games.length === 0) 
-    
-  }, [games.length]);
+  
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -24,7 +21,6 @@ export const Catalog = () => {
   };
 
   const handlePlay = (id: string) => {
-    ();
     playGame(id);
   };
 
@@ -156,3 +152,4 @@ export const Catalog = () => {
     </div>
   );
 };
+

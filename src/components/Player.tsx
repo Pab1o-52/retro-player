@@ -169,8 +169,7 @@ export const Player = () => {
   const handleHostGame = async () => {
     try {
       setDebugLog('Generating Invite...');
-      const stream = (canvasRef.current as any)?.captureStream(30);
-      const id = await netplayManager.hostGame(stream);
+      const id = await netplayManager.hostGame();
       setInviteId(id);
       setDebugLog('Waiting for P2...');
       
@@ -183,6 +182,10 @@ export const Player = () => {
             netplayManager.sendRom(activeGame!.title, activeGame!.system, buffer);
             setDebugLog('Sending ROM...');
           }
+            const stream = (canvasRef.current as any)?.captureStream(30);
+            if (stream) {
+              netplayManager.sendStream(stream);
+            }
         }
       };
     } catch (e: any) {
@@ -224,6 +227,7 @@ export const Player = () => {
           ref={videoRef}
           autoPlay
           playsInline
+          muted
           className="w-full h-full object-contain relative z-0"
           style={{ display: netplayManager.role === 'client' ? 'block' : 'none' }}
         />

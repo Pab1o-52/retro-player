@@ -59,7 +59,13 @@ class NetplayManager {
     });
   }
 
-  hostGame(canvasStream?: MediaStream): Promise<string> {
+  sendStream(stream: MediaStream) {
+    if (this.peer && this.conn) {
+      this.peer.call(this.conn.peer, stream);
+    }
+  }
+
+  hostGame(): Promise<string> {
     return new Promise((resolve, reject) => {
       this.disconnect();
       this.role = 'host';

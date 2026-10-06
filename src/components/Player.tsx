@@ -43,6 +43,18 @@ export const Player = () => {
             input_libretro_device_p1: 1,
             input_libretro_device_p2: 1,
             input_player2_joypad_index: 1,
+            input_player2_start: 'num1',
+            input_player2_select: 'num2',
+            input_player2_a: 'num3',
+            input_player2_b: 'num4',
+            input_player2_x: 'num5',
+            input_player2_y: 'num6',
+            input_player2_l: 'num7',
+            input_player2_r: 'num8',
+            input_player2_up: 'w',
+            input_player2_down: 's',
+            input_player2_left: 'a',
+            input_player2_right: 'd',
           }
         });
 

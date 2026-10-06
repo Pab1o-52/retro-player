@@ -59,7 +59,6 @@ export const Player = () => {
         nostalgistRef.current.exit();
         nostalgistRef.current = null;
       }
-      if (syncInterval.current) clearInterval(syncInterval.current);
     };
   }, [activeGameId, activeGame]);
 

@@ -10,7 +10,7 @@ try {
 } catch (e) {}
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds, isEditingLayout, setIsEditingLayout } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds, isEditingLayout, setIsEditingLayout, gamepadScales, setGamepadScales } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -308,7 +308,7 @@ export const Player = () => {
             📂
           </button>
           <button onClick={() => { setIsSettingsOpen(false); setIsEditingLayout(true); }} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xl shadow flex items-center justify-center">
-            🎨
+            📌
           </button>
         </div>
 
@@ -361,6 +361,25 @@ export const Player = () => {
         <div className="fixed inset-0 z-[100] flex flex-col justify-between items-center pointer-events-none p-4">
           <div className="bg-black/80 text-white px-6 py-3 rounded-full font-bold shadow-2xl backdrop-blur border border-gray-700 mt-10">
             Перетащите кнопки пальцем
+          </div>
+          
+          <div className="bg-black/90 p-4 rounded-xl border border-gray-700 w-full max-w-sm flex flex-col gap-3 pointer-events-auto mb-4">
+            <h3 className="text-white text-center font-bold">Размер кнопок</h3>
+            
+            <div className="flex items-center gap-2">
+              <label className="text-gray-300 text-xs w-20">Стик (лев):</label>
+              <input type="range" min="0.5" max="2" step="0.1" value={gamepadScales.left} onChange={(e) => setGamepadScales({...gamepadScales, left: parseFloat(e.target.value)})} className="flex-1 accent-blue-500" />
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <label className="text-gray-300 text-xs w-20">Кнопки (прав):</label>
+              <input type="range" min="0.5" max="2" step="0.1" value={gamepadScales.right} onChange={(e) => setGamepadScales({...gamepadScales, right: parseFloat(e.target.value)})} className="flex-1 accent-blue-500" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-gray-300 text-xs w-20">Start/Select:</label>
+              <input type="range" min="0.5" max="2" step="0.1" value={gamepadScales.center} onChange={(e) => setGamepadScales({...gamepadScales, center: parseFloat(e.target.value)})} className="flex-1 accent-blue-500" />
+            </div>
           </div>
           <button 
             onClick={() => setIsEditingLayout(false)}
@@ -441,16 +460,7 @@ export const Player = () => {
 
             <div className="w-full h-px bg-gray-700 my-2"></div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-gray-300 font-medium">Размер джойстика: {Math.round(joystickScale * 100)}%</label>
-              <input 
-                type="range" 
-                min="0.5" max="2" step="0.1" 
-                value={joystickScale} 
-                onChange={(e) => setJoystickScale(parseFloat(e.target.value))}
-                className="w-full accent-blue-500" 
-              />
-            </div>
+            
 
 
             <div className="flex flex-col gap-2">

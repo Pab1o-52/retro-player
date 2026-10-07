@@ -33,10 +33,12 @@ interface EmulatorState {
   isEditingLayout: boolean;
   setIsEditingLayout: (isEditingLayout: boolean) => void;
   gamepadOffsets: {
-    portrait: { left: {x: number, y: number}, right: {x: number, y: number} },
-    landscape: { left: {x: number, y: number}, right: {x: number, y: number} }
+    portrait: { left: {x: number, y: number}, right: {x: number, y: number}, center: {x: number, y: number} },
+    landscape: { left: {x: number, y: number}, right: {x: number, y: number}, center: {x: number, y: number} }
   };
   setGamepadOffsets: (offsets: any) => void;
+  gamepadScales: { left: number, right: number, center: number };
+  setGamepadScales: (scales: any) => void;
   keyBinds: Record<string, string>;
   setKeyBinds: (binds: Record<string, string>) => void;
   netplayStatus: string | null;
@@ -94,13 +96,21 @@ export const useStore = create<EmulatorState>((set, get) => ({
   setJoystickType: (type) => set({ joystickType: type }),
   isEditingLayout: false,
   setIsEditingLayout: (isEditingLayout) => set({ isEditingLayout }),
-  gamepadOffsets: JSON.parse(localStorage.getItem('gamepadOffsets') || 'null') || {
-    portrait: { left: {x:0, y:0}, right: {x:0, y:0} },
-    landscape: { left: {x:0, y:0}, right: {x:0, y:0} }
-  },
+  gamepadOffsets: (() => {
+    const saved = JSON.parse(localStorage.getItem('gamepadOffsets') || 'null');
+    return saved || {
+      portrait: { left: {x:0, y:0}, right: {x:0, y:0}, center: {x:0, y:0} },
+      landscape: { left: {x:0, y:0}, right: {x:0, y:0}, center: {x:0, y:0} }
+    };
+  })(),
   setGamepadOffsets: (offsets) => {
     localStorage.setItem('gamepadOffsets', JSON.stringify(offsets));
     set({ gamepadOffsets: offsets });
+  },
+  gamepadScales: JSON.parse(localStorage.getItem('gamepadScales') || 'null') || { left: 1, right: 1, center: 1 },
+  setGamepadScales: (scales) => {
+    localStorage.setItem('gamepadScales', JSON.stringify(scales));
+    set({ gamepadScales: scales });
   },
   keyBinds: {
     up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',

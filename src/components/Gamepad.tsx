@@ -25,10 +25,10 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
   }, []);
   const finalScale = scale * (isLandscape ? 0.7 : 0.9);
 
-  const { isEditingLayout, gamepadOffsets } = useStore();
+  const { isEditingLayout, gamepadOffsets, gamepadScales } = useStore();
   const currentOffsets = isLandscape ? gamepadOffsets.landscape : gamepadOffsets.portrait;
 
-  const handleDrag = (side: 'left' | 'right') => (e: React.PointerEvent) => {
+  const handleDrag = (side: 'left' | 'right' | 'center') => (e: React.PointerEvent) => {
     if (!isEditingLayout) return;
     e.preventDefault();
     e.stopPropagation();
@@ -37,7 +37,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     
     const startX = e.clientX;
     const startY = e.clientY;
-    const initialOffset = { ...currentOffsets[side] };
+    const initialOffset = { ...(currentOffsets[side] || {x:0, y:0}) };
 
     const onMove = (moveEv: PointerEvent) => {
       const dx = moveEv.clientX - startX;
@@ -212,7 +212,11 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-4 landscape:gap-10 mt-auto landscape:absolute landscape:bottom-2 landscape:left-0 landscape:right-0 landscape:z-[60] landscape:opacity-60 landscape:px-2" style={{ touchAction: 'none' }}>
       
       {/* Кнопки Select / Start */}
-      <div className="flex gap-6 justify-center shrink-0">
+      <div 
+        className={`flex gap-6 justify-center shrink-0 ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full touch-none p-2' : ''}`}
+        style={{ transform: `translate(${currentOffsets.center?.x || 0}px, ${currentOffsets.center?.y || 0}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * (gamepadScales.center || 1)})`, transformOrigin: 'center' }}
+        onPointerDown={isEditingLayout ? handleDrag('center') : undefined}
+      >
         <div className="flex flex-col items-center">
           <button 
             className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"
@@ -239,7 +243,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         {type === 'analog' ? (
           <div 
             className={`relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] flex items-center justify-center shrink-0 select-none border-2 border-dashed border-gray-700/50 rounded-full bg-gray-800/30 touch-none ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move' : ''}`}
-            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${finalScale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * gamepadScales.left})`, transformOrigin: 'bottom left' }}
             onPointerDown={isEditingLayout ? handleDrag('left') : handleJoystickStart}
             onPointerMove={handleJoystickMove}
             onPointerUp={handleJoystickEnd}
@@ -273,7 +277,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         ) : (
           <div 
             className={`relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full' : ''}`}
-            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${finalScale})`, transformOrigin: 'bottom left' }}
+            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * gamepadScales.left})`, transformOrigin: 'bottom left' }}
             onPointerDown={isEditingLayout ? handleDrag('left') : undefined}
           >
             <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700">
@@ -323,7 +327,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         {/* Экшн-кнопки */}
         <div 
           className={isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full touch-none p-4' : ''}
-          style={{ transform: `translate(${currentOffsets.right.x}px, ${currentOffsets.right.y}px) scale(${finalScale})`, transformOrigin: 'bottom right' }}
+          style={{ transform: `translate(${currentOffsets.right.x}px, ${currentOffsets.right.y}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * gamepadScales.right})`, transformOrigin: 'bottom right' }}
           onPointerDown={isEditingLayout ? handleDrag('right') : undefined}
         >
           {renderActionButtons()}

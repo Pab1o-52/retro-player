@@ -10,7 +10,7 @@ try {
 } catch (e) {}
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, setJoystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds, isEditingLayout, setIsEditingLayout } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -346,12 +346,28 @@ export const Player = () => {
         )}
       </div>
 
+
       <Gamepad 
         onButtonDown={handleButtonDown}
         onButtonUp={handleButtonUp}
         scale={joystickScale}
         layout={buttonLayout}
       />
+
+      {isEditingLayout && (
+        <div className="fixed inset-0 z-[100] flex flex-col justify-between items-center pointer-events-none p-4">
+          <div className="bg-black/80 text-white px-6 py-3 rounded-full font-bold shadow-2xl backdrop-blur border border-gray-700 mt-10">
+            Перетащите кнопки пальцем
+          </div>
+          <button 
+            onClick={() => setIsEditingLayout(false)}
+            className="bg-green-600 hover:bg-green-500 text-white px-10 py-4 rounded-full font-extrabold text-xl shadow-[0_10px_25px_rgba(0,0,0,0.8)] pointer-events-auto active:scale-95 transition-transform mb-10"
+          >
+            Готово
+          </button>
+        </div>
+      )}
+
 
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">

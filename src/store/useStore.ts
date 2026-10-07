@@ -30,6 +30,13 @@ interface EmulatorState {
   setButtonLayout: (layout: 2 | 3 | 4 | 6) => void;
   joystickType: 'analog' | 'dpad';
   setJoystickType: (type: 'analog' | 'dpad') => void;
+  isEditingLayout: boolean;
+  setIsEditingLayout: (isEditingLayout: boolean) => void;
+  gamepadOffsets: {
+    portrait: { left: {x: number, y: number}, right: {x: number, y: number} },
+    landscape: { left: {x: number, y: number}, right: {x: number, y: number} }
+  };
+  setGamepadOffsets: (offsets: any) => void;
   keyBinds: Record<string, string>;
   setKeyBinds: (binds: Record<string, string>) => void;
   netplayStatus: string | null;
@@ -85,6 +92,16 @@ export const useStore = create<EmulatorState>((set, get) => ({
   setButtonLayout: (layout) => set({ buttonLayout: layout }),
   joystickType: 'analog',
   setJoystickType: (type) => set({ joystickType: type }),
+  isEditingLayout: false,
+  setIsEditingLayout: (isEditingLayout) => set({ isEditingLayout }),
+  gamepadOffsets: JSON.parse(localStorage.getItem('gamepadOffsets') || 'null') || {
+    portrait: { left: {x:0, y:0}, right: {x:0, y:0} },
+    landscape: { left: {x:0, y:0}, right: {x:0, y:0} }
+  },
+  setGamepadOffsets: (offsets) => {
+    localStorage.setItem('gamepadOffsets', JSON.stringify(offsets));
+    set({ gamepadOffsets: offsets });
+  },
   keyBinds: {
     up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
     a: 'KeyZ', b: 'KeyX', c: 'KeyC', x: 'KeyA', y: 'KeyS', z: 'KeyD',

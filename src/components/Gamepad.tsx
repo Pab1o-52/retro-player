@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useStore } from '../store/useStore';
 
 
 interface GamepadProps {
@@ -23,6 +24,40 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     return () => window.removeEventListener('resize', checkOrientation);
   }, []);
   const finalScale = scale * (isLandscape ? 0.7 : 0.9);
+
+  const { isEditingLayout, gamepadOffsets } = useStore();
+  const currentOffsets = isLandscape ? gamepadOffsets.landscape : gamepadOffsets.portrait;
+
+  const handleDrag = (side: 'left' | 'right') => (e: React.PointerEvent) => {
+    if (!isEditingLayout) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const target = e.currentTarget as HTMLElement;
+    target.setPointerCapture(e.pointerId);
+    
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const initialOffset = { ...currentOffsets[side] };
+
+    const onMove = (moveEv: PointerEvent) => {
+      const dx = moveEv.clientX - startX;
+      const dy = moveEv.clientY - startY;
+      const newOffsets = JSON.parse(JSON.stringify(useStore.getState().gamepadOffsets));
+      const mode = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+      newOffsets[mode][side] = { x: initialOffset.x + dx, y: initialOffset.y + dy };
+      useStore.getState().setGamepadOffsets(newOffsets);
+    };
+
+    const onUp = (upEv: PointerEvent) => {
+      try { target.releasePointerCapture(upEv.pointerId); } catch(e){}
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
   
@@ -203,9 +238,9 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         {/* Зона плавающего джойстика */}
         {type === 'analog' ? (
           <div 
-            className="relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] flex items-center justify-center shrink-0 select-none border-2 border-dashed border-gray-700/50 rounded-full bg-gray-800/30 touch-none"
-            style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom left' }}
-            onPointerDown={handleJoystickStart}
+            className={`relative w-[180px] h-[180px] sm:w-[220px] sm:h-[220px] flex items-center justify-center shrink-0 select-none border-2 border-dashed border-gray-700/50 rounded-full bg-gray-800/30 touch-none ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move' : ''}`}
+            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${finalScale})`, transformOrigin: 'bottom left' }}
+            onPointerDown={isEditingLayout ? handleDrag('left') : handleJoystickStart}
             onPointerMove={handleJoystickMove}
             onPointerUp={handleJoystickEnd}
             onPointerCancel={handleJoystickEnd}
@@ -237,8 +272,9 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
           </div>
         ) : (
           <div 
-            className="relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none"
-            style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom left' }}
+            className={`relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full' : ''}`}
+            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${finalScale})`, transformOrigin: 'bottom left' }}
+            onPointerDown={isEditingLayout ? handleDrag('left') : undefined}
           >
             <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700">
               <button 
@@ -285,7 +321,11 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
             </>
           )}
         {/* Экшн-кнопки */}
-        <div style={{ transform: `scale(${finalScale})`, transformOrigin: 'bottom right' }}>
+        <div 
+          className={isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full touch-none p-4' : ''}
+          style={{ transform: `translate(${currentOffsets.right.x}px, ${currentOffsets.right.y}px) scale(${finalScale})`, transformOrigin: 'bottom right' }}
+          onPointerDown={isEditingLayout ? handleDrag('right') : undefined}
+        >
           {renderActionButtons()}
         </div>
 

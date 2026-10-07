@@ -363,12 +363,32 @@ export const Player = () => {
               {inviteId ? (
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Отправь эту ссылку другу (или ID):</p>
-                  <input 
-                    readOnly 
-                    value={`${window.location.origin}${window.location.pathname}?join=${inviteId}`}
-                    className="w-full bg-black border border-gray-700 text-green-400 p-2 rounded text-xs mb-2"
-                    onClick={e => (e.target as HTMLInputElement).select()}
-                  />
+                  <div className="flex gap-2 mb-2">
+                    <input 
+                      readOnly 
+                      value={`${window.location.origin}${window.location.pathname}?join=${inviteId}`}
+                      className="flex-1 bg-black border border-gray-700 text-green-400 p-2 rounded text-xs min-w-0"
+                      onClick={e => (e.target as HTMLInputElement).select()}
+                    />
+                    <button
+                      onClick={() => {
+                        const url = `${window.location.origin}${window.location.pathname}?join=${inviteId}`;
+                        if (navigator.share) {
+                          navigator.share({
+                            title: 'Присоединяйся к игре!',
+                            text: 'Давай играть вместе!',
+                            url: url
+                          }).catch(err => console.error(err));
+                        } else {
+                          navigator.clipboard.writeText(url);
+                          alert('Ссылка скопирована!');
+                        }
+                      }}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded font-bold shadow text-xs whitespace-nowrap"
+                    >
+                      Поделиться
+                    </button>
+                  </div>
                   <div className="text-xs text-center text-gray-500 mb-2">
                     Статус: {netplayStatus || 'Ожидание P2...'}
                   </div>

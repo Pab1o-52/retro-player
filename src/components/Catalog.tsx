@@ -9,6 +9,7 @@ export const Catalog = () => {
   const [showArchive, setShowArchive] = useState(false);
   
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'nes' | 'segaMD' | 'snes'>('all');
 
   useEffect(() => {
     loadGames();
@@ -141,9 +142,17 @@ export const Catalog = () => {
       )}
 
       <div className="relative max-w-7xl mx-auto mb-8">
-        <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Каталог (Homebrew & Archive)</h2>
+                <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Топ 100 Игр (Archive)</h2>
+        
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+          <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Все игры</button>
+          <button onClick={() => setActiveTab('nes')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'nes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Dendy (NES)</button>
+          <button onClick={() => setActiveTab('segaMD')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'segaMD' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Sega</button>
+          <button onClick={() => setActiveTab('snes')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'snes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Super Nintendo</button>
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 p-2">
-          {FEATURED_GAMES.map(game => (
+          {FEATURED_GAMES.filter(g => activeTab === 'all' || g.system === activeTab).map(game => (
             <React.Fragment key={game.id}>
               {renderGameCartridge(
                 game.title,

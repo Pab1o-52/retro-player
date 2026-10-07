@@ -83,7 +83,7 @@ export const Player = () => {
         
         const nostalgist = await Nostalgist.launch({
           core: coreName,
-          rom: activeGame.fileName ? { fileName: activeGame.fileName, fileContent: buffer } : buffer,
+          rom: activeGame.fileName ? new File([buffer], activeGame.fileName) : new File([buffer], 'game.nes'),
           element: canvasRef.current!,
           retroarchConfig: {
             input_libretro_device_p1: 1,

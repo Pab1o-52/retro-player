@@ -154,11 +154,28 @@ return (
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 p-2">
-          {FEATURED_GAMES.filter(g => activeTab === 'all' || g.system === activeTab).map(game => (
-            <React.Fragment key={game.id}>
-              <GameCartridge title={game.title} system={game.system} imageUrl={game.coverUrl} onClick={() => handleDownloadFeatured(game)} btnText="СКАЧАТЬ" isDownloading={downloadingId === game.id} />
-            </React.Fragment>
-          ))}
+          {FEATURED_GAMES.filter(g => activeTab === 'all' || g.system === activeTab).map(game => {
+              const downloadedGame = games.find(g => g.title === game.title);
+              return (
+                <React.Fragment key={game.id}>
+                  <GameCartridge 
+                    title={game.title} 
+                    system={game.system} 
+                    imageUrl={game.coverUrl} 
+                    onClick={() => {
+                      if (downloadedGame) {
+                        handlePlay(downloadedGame.id);
+                      } else {
+                        handleDownloadFeatured(game);
+                      }
+                    }} 
+                    btnText={downloadedGame ? "ИГРАТЬ" : "СКАЧАТЬ"} 
+                    isDownloading={downloadingId === game.id} 
+                    isReady={!!downloadedGame}
+                  />
+                </React.Fragment>
+              );
+            })}
         </div>
       </div>
       

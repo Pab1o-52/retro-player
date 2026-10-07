@@ -177,7 +177,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-4 landscape:gap-10 mt-auto landscape:absolute landscape:bottom-2 landscape:left-0 landscape:right-0 landscape:z-[60] landscape:opacity-60 landscape:px-2" style={{ touchAction: 'none' }}>
       
       {/* Кнопки Select / Start */}
-      <div className="flex gap-6 justify-center shrink-0">
+      <div className="flex gap-6 justify-center shrink-0 md:order-last md:mt-4">
         <div className="flex flex-col items-center">
           <button 
             className="w-16 h-6 bg-gray-900 rounded-full border-2 border-gray-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),0_2px_0_rgba(255,255,255,0.1)] active:translate-y-1 active:shadow-[inset_0_4px_6px_rgba(0,0,0,0.9)] transition-all"

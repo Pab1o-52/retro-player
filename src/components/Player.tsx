@@ -290,7 +290,7 @@ export const Player = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-4 touch-none h-[100dvh]">
+    <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-1 sm:p-4 touch-none h-[100dvh]">
       
       <div className="w-full max-w-5xl mx-auto flex justify-between items-center mb-4 px-2 gap-2 landscape:absolute landscape:top-2 landscape:left-0 landscape:right-0 landscape:px-6 landscape:z-[60] landscape:opacity-50 hover:landscape:opacity-100 transition-opacity">
         <button 
@@ -320,7 +320,7 @@ export const Player = () => {
         </button>
       </div>
 
-      <div className="relative w-full max-w-5xl mx-auto aspect-[256/240] bg-black border-4 md:border-[12px] border-gray-800 rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-2 sm:mb-8 flex justify-center items-center landscape:max-w-none landscape:w-screen landscape:h-screen landscape:aspect-auto landscape:border-0 landscape:rounded-none landscape:m-0 landscape:absolute landscape:inset-0">
+      <div className="relative w-full max-w-5xl mx-auto aspect-[256/240] bg-black border-2 md:border-[12px] border-gray-800 rounded-lg md:rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(0,0,0,1)] mb-2 sm:mb-8 flex justify-center items-center landscape:max-w-none landscape:w-screen landscape:h-screen landscape:aspect-auto landscape:border-0 landscape:rounded-none landscape:m-0 landscape:absolute landscape:inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none z-10" />
         
         <canvas 

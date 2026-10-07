@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 
 const COLLECTIONS = [
   { id: 'No-Intro_NES', name: 'NES (Dendy)', system: 'nes' },
-  { id: 'ef_nintendo_snes_no-intro_2024-04-20', name: 'Super Nintendo', system: 'snes' }
+  { id: 'ef_nintendo_snes_no-intro_2024-04-20', name: 'Super Nintendo', system: 'snes' },
+  { id: 'ef_mega_genesis_no-intro_2024-04-21', name: 'Sega Mega Drive', system: 'segaMD' }
 ];
 
 interface ArchiveFile {
@@ -16,6 +17,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [limit, setLimit] = useState(50);
 
   useEffect(() => {
     setLoading(true);
@@ -53,7 +55,8 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
     }
   };
 
-  const filtered = files.filter(f => f.name.toLowerCase().includes(search.toLowerCase())).slice(0, 50);
+  const allFiltered = files.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = allFiltered.slice(0, limit);
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex flex-col p-4 sm:p-8 overflow-hidden text-white font-sans">
@@ -68,7 +71,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
         <select 
           className="bg-gray-800 border border-gray-700 text-white p-3 rounded-lg flex-1 font-bold"
           value={collection.id}
-          onChange={(e) => setCollection(COLLECTIONS.find(c => c.id === e.target.value) || COLLECTIONS[0])}
+          onChange={(e) => { setCollection(COLLECTIONS.find(c => c.id === e.target.value) || COLLECTIONS[0]); setLimit(50); }}
         >
           {COLLECTIONS.map(c => (
             <option key={c.id} value={c.id}>{c.name}</option>
@@ -80,7 +83,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
           placeholder="Поиск по названию (напр. Mario)..." 
           className="bg-gray-800 border border-gray-700 text-white p-3 rounded-lg flex-[2]"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setLimit(50); }}
         />
       </div>
 

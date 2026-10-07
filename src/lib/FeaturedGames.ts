@@ -276,14 +276,14 @@ export const FEATURED_GAMES = [
     id: 'game_39',
     title: 'Donkey Kong Country 2',
     system: 'snes',
-    romUrl: 'https://cors.archive.org/cors/ef_nintendo_snes_no-intro_2024-04-20/Donkey%20Kong%20Country%202%20-%20Diddys%20Kong%20Quest%20%28USA%29%20%28Rev%201%29.zip',
+    romUrl: 'https://cors.archive.org/cors/ef_nintendo_snes_no-intro_2024-04-20/Donkey%20Kong%20Country%202%20-%20Diddy%27s%20Kong%20Quest%20%28USA%29%20%28En%2CFr%29%20%28Rev%201%29.zip',
     coverUrl: 'https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Super_Nintendo_Entertainment_System/master/Named_Boxarts/Donkey%20Kong%20Country%202%20-%20Diddys%20Kong%20Quest%20%28USA%29%20%28Rev%201%29.png',
   },
   {
     id: 'game_40',
     title: 'Donkey Kong Country 3',
     system: 'snes',
-    romUrl: 'https://cors.archive.org/cors/ef_nintendo_snes_no-intro_2024-04-20/Donkey%20Kong%20Country%203%20-%20Dixie%20Kongs%20Double%20Trouble%21%20%28USA%29.zip',
+    romUrl: 'https://cors.archive.org/cors/ef_nintendo_snes_no-intro_2024-04-20/Donkey%20Kong%20Country%203%20-%20Dixie%20Kong%27s%20Double%20Trouble%21%20%28USA%29%20%28En%2CFr%29.zip',
     coverUrl: 'https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Super_Nintendo_Entertainment_System/master/Named_Boxarts/Donkey%20Kong%20Country%203%20-%20Dixie%20Kongs%20Double%20Trouble%21%20%28USA%29.png',
   },
   {

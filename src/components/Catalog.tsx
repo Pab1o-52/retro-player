@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArchiveBrowser } from './ArchiveBrowser';
 import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
+import { Starfield } from './Starfield';
 
 
 const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading, isReady }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean, isReady?: boolean, progress?: number }) => {
@@ -91,7 +92,9 @@ export const Catalog = () => {
       setDownloadingId(game.id);
       setDownloadProgress(0);
       const res = await fetch(game.romUrl);
-      if (!res.ok) throw new Error('Failed to fetch ROM');
+      if (!res.ok || res.headers.get('content-type')?.includes('text/html')) {
+        throw new Error('Failed to fetch ROM or blocked by CORS');
+      }
       
       const contentLength = res.headers.get('content-length');
       const total = contentLength ? parseInt(contentLength, 10) : 1024 * 1024; // fallback 1MB
@@ -131,8 +134,8 @@ export const Catalog = () => {
 
   
 return (
-    <div className="min-h-full p-4 sm:p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-indigo-900/30 to-black relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+CjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiIGZpbGw9Im5vbmUiLz4KPHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiIHN0cm9rZS13aWR0aD0iMSIvPgo8L3N2Zz4=')] opacity-50 pointer-events-none mix-blend-overlay"></div>
+    <div className="min-h-full p-4 sm:p-6 bg-black relative overflow-hidden">
+      <Starfield />
       
       <div className="relative flex justify-between items-center mb-8 max-w-7xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold">Retro Player</h1>

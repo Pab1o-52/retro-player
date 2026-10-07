@@ -44,7 +44,9 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
       setProgress(0);
       const url = `https://cors.archive.org/cors/${collection.id}/${encodeURIComponent(file.name)}`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error("Network response was not ok");
+      if (!res.ok || res.headers.get('content-type')?.includes('text/html')) {
+        throw new Error("Network response was not ok or blocked by CORS");
+      }
       
       const total = parseInt((file as any).size || '0', 10) || 0;
       

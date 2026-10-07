@@ -34,7 +34,7 @@ export const Catalog = () => {
       const blob = await res.blob();
       const ext = game.system === 'sega' ? '.md' : '.nes';
       const file = new File([blob], `${game.title}${ext}`, { type: blob.type });
-      await addGame(file);
+      await addGame(file, game.system);
     } catch (e) {
       alert('Ошибка при скачивании файла. Возможно блокировка CORS от Archive.org.');
       console.error(e);
@@ -162,9 +162,9 @@ export const Catalog = () => {
       {showArchive && (
         <ArchiveBrowser 
           onClose={() => setShowArchive(false)} 
-          onDownload={async (file: File) => {
+          onDownload={async (file, system) => {
             setShowArchive(false);
-            await addGame(file);
+            await addGame(file, system);
           }} 
         />
       )}

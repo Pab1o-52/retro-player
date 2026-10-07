@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
 const COLLECTIONS = [
-  { id: 'No-Intro_NES', name: 'NES (Dendy)' },
-  { id: 'ef_nintendo_snes_no-intro_2024-04-20', name: 'Super Nintendo' }
+  { id: 'No-Intro_NES', name: 'NES (Dendy)', system: 'nes' },
+  { id: 'ef_nintendo_snes_no-intro_2024-04-20', name: 'Super Nintendo', system: 'snes' }
 ];
 
 interface ArchiveFile {
@@ -10,7 +10,7 @@ interface ArchiveFile {
   size: string;
 }
 
-export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: File) => void, onClose: () => void }) => {
+export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: File, system: string) => void, onClose: () => void }) => {
   const [collection, setCollection] = useState(COLLECTIONS[0]);
   const [files, setFiles] = useState<ArchiveFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
       if (!res.ok) throw new Error("Network response was not ok");
       const blob = await res.blob();
       const newFile = new File([blob], file.name);
-      onDownload(newFile);
+      onDownload(newFile, collection.system);
     } catch (e) {
       console.error(e);
       alert("Ошибка скачивания. Возможно архив недоступен из-за CORS или блокировки.");

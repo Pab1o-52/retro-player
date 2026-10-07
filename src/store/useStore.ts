@@ -7,6 +7,7 @@ localforage.config({
 });
 
 export interface Game {
+  fileName?: string;
   id: string;
   title: string;
   addedAt: number;
@@ -17,7 +18,7 @@ interface EmulatorState {
   games: Game[];
   activeGameId: string | null;
   loadGames: () => Promise<void>;
-  addGame: (file: File) => Promise<void>;
+  addGame: (file: File, explicitSystem?: string) => Promise<void>;
   playGame: (id: string) => void;
   stopGame: () => void;
   getRomBuffer: (id: string) => Promise<ArrayBuffer | null>;
@@ -54,14 +55,15 @@ export const useStore = create<EmulatorState>((set, get) => ({
     const games = await localforage.getItem<Game[]>('catalog') || [];
     set({ games });
   },
-  addGame: async (file: File) => {
+  addGame: async (file: File, explicitSystem?: string) => {
     const id = crypto.randomUUID();
     const buffer = await file.arrayBuffer();
     await localforage.setItem(`rom_${id}`, buffer);
     const newGame: Game = {
       id,
       title: file.name.replace(/\.[a-zA-Z0-9]+$/i, ''),
-      system: file.name.toLowerCase().endsWith('.md') || file.name.toLowerCase().endsWith('.gen') || file.name.toLowerCase().endsWith('.smd') || file.name.toLowerCase().endsWith('.bin') ? 'sega' : 'nes',
+        fileName: file.name,
+      system: explicitSystem || (file.name.toLowerCase().match(/\.(md|gen|smd|bin)$/) ? 'sega' : (file.name.toLowerCase().match(/\.(sfc|smc)$/) ? 'snes' : 'nes')),
       addedAt: Date.now()
     };
     const updatedGames = [...get().games, newGame];

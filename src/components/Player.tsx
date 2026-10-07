@@ -79,11 +79,11 @@ export const Player = () => {
       if (isCancelled || !buffer) return;
       
       try {
-        const coreName = activeGame.system === 'sega' ? 'genesis_plus_gx' : 'fceumm';
+        const coreName = (activeGame.system === 'sega' || activeGame.system === 'segaMD') ? 'genesis_plus_gx' : (activeGame.system === 'snes' ? 'snes9x' : 'fceumm');
         
         const nostalgist = await Nostalgist.launch({
           core: coreName,
-          rom: buffer,
+          rom: activeGame.fileName ? { fileName: activeGame.fileName, fileContent: buffer } : buffer,
           element: canvasRef.current!,
           retroarchConfig: {
             input_libretro_device_p1: 1,

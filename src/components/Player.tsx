@@ -292,7 +292,7 @@ export const Player = () => {
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col justify-between p-1 sm:p-4 touch-none h-[100dvh]">
       
-      <div className="w-full max-w-5xl mx-auto flex justify-between items-center mb-4 px-2 gap-2 landscape:absolute landscape:top-2 landscape:left-0 landscape:right-0 landscape:px-6 landscape:z-[60] landscape:opacity-50 hover:landscape:opacity-100 transition-opacity">
+      <div className="w-full max-w-5xl mx-auto flex justify-between items-center mb-2 px-2 gap-2 landscape:absolute landscape:top-2 landscape:left-0 landscape:right-0 landscape:px-6 landscape:z-[60] landscape:opacity-50 hover:landscape:opacity-100 transition-opacity">
         <button 
           onClick={() => setIsSettingsOpen(true)}
           className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-xl transition-colors shadow flex items-center justify-center"
@@ -355,15 +355,16 @@ export const Player = () => {
         onButtonUp={handleButtonUp}
         scale={joystickScale}
         layout={buttonLayout}
+        type={joystickType}
       />
 
       {isEditingLayout && (
         <div className="fixed inset-0 z-[100] flex flex-col justify-between items-center pointer-events-none p-4">
-          <div className="bg-black/80 text-white px-6 py-3 rounded-full font-bold shadow-2xl backdrop-blur border border-gray-700 mt-10">
+          <div className="bg-black/80 text-white px-6 py-2 rounded-full font-bold shadow-2xl backdrop-blur border border-gray-700 mt-10">
             Перетащите кнопки пальцем
           </div>
           
-          <div className="bg-black/90 p-4 rounded-xl border border-gray-700 w-full max-w-sm flex flex-col gap-3 pointer-events-auto mb-4">
+          <div className="bg-black/90 p-4 rounded-xl border border-gray-700 w-full max-w-sm flex flex-col gap-3 pointer-events-auto mb-2">
             <h3 className="text-white text-center font-bold">Размер кнопок</h3>
             
             <div className="flex items-center gap-2">
@@ -393,10 +394,10 @@ export const Player = () => {
 
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-bold text-white text-center mb-2">Настройки</h2>
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 w-full max-w-sm flex flex-col gap-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-white text-center mb-1">Настройки</h2>
             
-            <div className="bg-gray-900 border border-blue-500/50 p-4 rounded-lg flex flex-col gap-2">
+            <div className="bg-gray-900 border border-blue-500/50 p-3 rounded-lg flex flex-col gap-2">
               <h3 className="text-blue-400 font-bold">🌐 Мультиплеер (P2P)</h3>
               {inviteId ? (
                 <div>
@@ -458,14 +459,14 @@ export const Player = () => {
               )}
             </div>
 
-            <div className="w-full h-px bg-gray-700 my-2"></div>
+            <div className="w-full h-px bg-gray-700 my-1"></div>
 
             
 
 
             <div className="flex flex-col gap-2">
               <label className="text-gray-300 font-medium">Количество кнопок</label>
-              <div className="flex flex-col gap-2 mt-4 mb-4">
+              <div className="flex flex-col gap-2 mt-4 mb-2">
                 <label className="text-gray-300 font-medium">Тип крестовины (Движение):</label>
                 <div className="flex gap-2">
                   {['analog', 'dpad'].map(type => (
@@ -491,27 +492,27 @@ export const Player = () => {
               </select>
             </div>
 
-            <div className="w-full h-px bg-gray-700 my-2"></div>
+            <div className="w-full h-px bg-gray-700 my-1"></div>
             
             <button 
               onClick={() => { setIsSettingsOpen(false); setIsKeyboardSettingsOpen(true); }}
-              className="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-bold shadow-md w-full"
+              className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-bold shadow-md w-full"
             >
               ⌨️ Настроить клавиатуру
             </button>
 
-            <div className="w-full h-px bg-gray-700 my-2"></div>
+            <div className="w-full h-px bg-gray-700 my-1"></div>
 
             <button 
               onClick={handleFullScreen}
-              className="bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-bold transition-colors"
+              className="bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg font-bold transition-colors"
             >
               🖥 Full Screen
             </button>
 
             <button 
               onClick={() => setIsSettingsOpen(false)}
-              className="bg-red-600 hover:bg-red-500 text-white py-3 rounded-lg font-bold transition-colors mt-2"
+              className="bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg font-bold transition-colors mt-2"
             >
               Закрыть
             </button>
@@ -530,7 +531,7 @@ export const Player = () => {
                 <button
                   key={btn}
                   onClick={() => setMappingBtn(btn)}
-                  className={`flex justify-between items-center px-3 py-3 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
+                  className={`flex justify-between items-center px-3 py-2 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
                 >
                   <span className="uppercase font-bold">{btn}</span>
                   <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? 'НАЖМИТЕ...' : code.replace('Key', '').replace('Arrow', '')}</span>
@@ -539,7 +540,7 @@ export const Player = () => {
             </div>
             <button 
               onClick={() => { setIsKeyboardSettingsOpen(false); setIsSettingsOpen(true); }}
-              className="bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg font-bold transition-colors mt-2 w-full"
+              className="bg-gray-600 hover:bg-gray-500 text-white py-2 rounded-lg font-bold transition-colors mt-2 w-full"
             >
               Назад в настройки
             </button>

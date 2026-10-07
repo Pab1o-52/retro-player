@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { ArchiveBrowser } from './ArchiveBrowser';
 import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 
 export const Catalog = () => {
   const { games, addGame, loadGames, removeGame, playGame } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showArchive, setShowArchive] = useState(false);
   
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
@@ -93,16 +95,24 @@ export const Catalog = () => {
       <div className="relative flex justify-between items-center mb-8 max-w-7xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold">Retro Player</h1>
         
-        <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full cursor-pointer font-bold shadow-lg transition-transform hover:scale-105 inline-block text-sm sm:text-base">
-          Добавить свою игру
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            accept=".nes,.md,.gen,.bin,.smd" 
-            className="hidden" 
-            onChange={handleFileUpload} 
-          />
-        </label>
+        <div className="flex gap-2 sm:gap-4">
+          <button 
+            onClick={() => setShowArchive(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
+          >
+            <span>🏛️</span> Каталог Игр
+          </button>
+          <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full cursor-pointer font-bold shadow-lg transition-transform hover:scale-105 inline-block text-sm sm:text-base">
+            Загрузить свой файл
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              accept=".nes,.md,.gen,.bin,.smd,.sfc,.smc,.zip" 
+              className="hidden" 
+              onChange={handleFileUpload} 
+            />
+          </label>
+        </div>
       </div>
 
       {games.length > 0 && (
@@ -149,6 +159,15 @@ export const Catalog = () => {
         </div>
       </div>
       
+      {showArchive && (
+        <ArchiveBrowser 
+          onClose={() => setShowArchive(false)} 
+          onDownload={async (file: File) => {
+            setShowArchive(false);
+            await addGame(file);
+          }} 
+        />
+      )}
     </div>
   );
 };

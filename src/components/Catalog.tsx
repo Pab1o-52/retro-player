@@ -4,7 +4,7 @@ import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 
 
-const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean }) => {
+const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading, isReady }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean, isReady?: boolean }) => {
   const [imgSrc, setImgSrc] = useState(imageUrl);
   const [failed, setFailed] = useState(false);
 
@@ -51,7 +51,7 @@ const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, is
         <button 
           onClick={onClick}
           disabled={isDownloading}
-          className={`w-full bg-gradient-to-b from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border border-red-900 text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded font-extrabold shadow-[0_4px_6px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all uppercase tracking-wider text-[10px] sm:text-sm ${isDownloading ? 'opacity-50 cursor-wait' : ''}`}
+          className={`w-full bg-gradient-to-b ${isReady ? 'from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border-green-900' : 'from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border-red-900'} border text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded font-extrabold shadow-[0_4px_6px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all uppercase tracking-wider text-[10px] sm:text-sm ${isDownloading ? 'opacity-50 cursor-wait' : ''}`}
         >
           {isDownloading ? 'Загрузка...' : btnText}
         </button>

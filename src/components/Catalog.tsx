@@ -67,7 +67,7 @@ export const Catalog = () => {
          <img 
            src={imageUrl}
            alt={title}
-           className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+           className="w-full h-full object-contain bg-black opacity-90 group-hover:opacity-100 transition-opacity"
            onError={(e) => {
              (e.target as HTMLImageElement).style.display = 'none';
              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');

@@ -307,6 +307,9 @@ export const Player = () => {
           <button onClick={handleLoad} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xl shadow flex items-center justify-center">
             📂
           </button>
+          <button onClick={() => { setIsSettingsOpen(false); setIsEditingLayout(true); }} className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xl shadow flex items-center justify-center">
+            🎨
+          </button>
         </div>
 
         <button 

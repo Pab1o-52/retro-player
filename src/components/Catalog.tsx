@@ -4,7 +4,7 @@ import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 
 
-const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading, isReady }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean, isReady?: boolean }) => {
+const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading, isReady }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean, isReady?: boolean, progress?: number }) => {
   const [imgSrc, setImgSrc] = useState(imageUrl);
   const [failed, setFailed] = useState(false);
 
@@ -67,6 +67,7 @@ export const Catalog = () => {
   const [showArchive, setShowArchive] = useState(false);
   
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState<'all' | 'nes' | 'segaMD' | 'snes'>('all');
 
   useEffect(() => {
@@ -88,17 +89,43 @@ export const Catalog = () => {
   const handleDownloadFeatured = async (game: typeof FEATURED_GAMES[0]) => {
     try {
       setDownloadingId(game.id);
+      setDownloadProgress(0);
       const res = await fetch(game.romUrl);
       if (!res.ok) throw new Error('Failed to fetch ROM');
-      const blob = await res.blob();
-      const ext = game.system === 'sega' ? '.md' : '.nes';
+      
+      const contentLength = res.headers.get('content-length');
+      const total = contentLength ? parseInt(contentLength, 10) : 1024 * 1024; // fallback 1MB
+      
+      if (!res.body) {
+        const blob = await res.blob();
+        const ext = game.system === 'segaMD' ? '.md' : game.system === 'snes' ? '.sfc' : '.nes';
+        const file = new File([blob], `${game.title}${ext}`, { type: blob.type });
+        await addGame(file, game.system);
+        return;
+      }
+      
+      const reader = res.body.getReader();
+      let received = 0;
+      const chunks = [];
+      
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total > 0) setDownloadProgress(Math.min(100, (received / total) * 100));
+      }
+      
+      const blob = new Blob(chunks, { type: 'application/octet-stream' });
+      const ext = game.system === 'segaMD' ? '.md' : game.system === 'snes' ? '.sfc' : '.nes';
       const file = new File([blob], `${game.title}${ext}`, { type: blob.type });
       await addGame(file, game.system);
     } catch (e) {
-      alert('Ошибка при скачивании файла. Возможно блокировка CORS от Archive.org.');
+      alert('Ошибка при загрузке игры.');
       console.error(e);
     } finally {
       setDownloadingId(null);
+      setDownloadProgress(0);
     }
   };
 
@@ -170,7 +197,7 @@ return (
                       }
                     }} 
                     btnText={downloadedGame ? "ИГРАТЬ" : "СКАЧАТЬ"} 
-                    isDownloading={downloadingId === game.id} 
+                    isDownloading={downloadingId === game.id} progress={downloadingId === game.id ? downloadProgress : 0} 
                     isReady={!!downloadedGame}
                   />
                 </React.Fragment>

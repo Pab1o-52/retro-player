@@ -17,6 +17,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const [limit, setLimit] = useState(50);
 
   useEffect(() => {
@@ -40,18 +41,41 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
   const handleDownload = async (file: ArchiveFile) => {
     try {
       setDownloading(file.name);
-      // Use cors.archive.org for better CORS support
+      setProgress(0);
       const url = `https://cors.archive.org/cors/${collection.id}/${encodeURIComponent(file.name)}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error("Network response was not ok");
-      const blob = await res.blob();
+      
+      const total = parseInt((file as any).size || '0', 10) || 0;
+      
+      if (!res.body) {
+        const blob = await res.blob();
+        const newFile = new File([blob], file.name);
+        onDownload(newFile, collection.system);
+        return;
+      }
+      
+      const reader = res.body.getReader();
+      let received = 0;
+      const chunks = [];
+      
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total > 0) setProgress((received / total) * 100);
+      }
+      
+      const blob = new Blob(chunks, { type: 'application/octet-stream' });
       const newFile = new File([blob], file.name);
       onDownload(newFile, collection.system);
     } catch (e) {
       console.error(e);
-      alert("Ошибка скачивания. Возможно архив недоступен из-за CORS или блокировки.");
+      alert("Ошибка загрузки. Возможно файл недоступен из-за CORS или заблокирован.");
     } finally {
       setDownloading(null);
+      setProgress(0);
     }
   };
 
@@ -107,12 +131,15 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
                     <h3 className="font-bold text-sm truncate" title={cleanName}>{cleanName}</h3>
                     <p className="text-xs text-gray-500 mt-1">{(parseInt(f.size || '0') / 1024).toFixed(1)} KB</p>
                   </div>
-                  <button 
+                                    <button 
                     onClick={() => handleDownload(f)}
                     disabled={!!downloading}
-                    className={`shrink-0 px-4 py-2 rounded font-bold text-xs ${isDownloading ? 'bg-gray-600 text-gray-300' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'}`}
+                    className={`relative overflow-hidden shrink-0 px-4 py-2 rounded font-bold text-xs ${isDownloading ? 'bg-gray-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg'}`}
                   >
-                    {isDownloading ? 'Загрузка...' : 'Играть'}
+                    {isDownloading && progress > 0 && (
+                      <div className="absolute top-0 left-0 h-full bg-blue-500 opacity-60 pointer-events-none transition-all duration-300" style={{ width: `${progress}%` }} />
+                    )}
+                    <span className="relative z-10">{isDownloading ? (progress > 0 ? `${Math.round(progress)}%` : 'Загрузка...') : 'СКАЧАТЬ'}</span>
                   </button>
                 </div>
               );

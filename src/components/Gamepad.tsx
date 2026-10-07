@@ -60,6 +60,7 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
 
   const [joystickCenter, setJoystickCenter] = useState<Point | null>(null);
   const [joystickThumb, setJoystickThumb] = useState<Point | null>(null);
+  const [dpadActive, setDpadActive] = useState<Set<string>>(new Set());
   
   const activeBtns = useRef<Set<string>>(new Set());
 
@@ -81,6 +82,59 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
   };
 
   // --- ЛОГИКА ПЛАВАЮЩЕГО ДЖОЙСТИКА ---
+
+  // --- Классический D-PAD (с поддержкой диагоналей) ---
+  const handleDpadEvent = (e: React.PointerEvent) => {
+    if (isEditingLayout) return;
+    e.preventDefault();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+
+    const newActive = new Set<string>();
+    
+    // Мертвая зона для центра
+    const deadzone = 12 * finalScale; 
+    
+    if (Math.abs(dx) > deadzone || Math.abs(dy) > deadzone) {
+      if (dx < -deadzone) newActive.add('left');
+      if (dx > deadzone) newActive.add('right');
+      if (dy < -deadzone) newActive.add('up');
+      if (dy > deadzone) newActive.add('down');
+    }
+
+    activeBtns.current.forEach(btn => {
+      if (!newActive.has(btn)) onButtonUp(btn);
+    });
+    newActive.forEach(btn => {
+      if (!activeBtns.current.has(btn)) {
+        onButtonDown(btn);
+        triggerVibration();
+      }
+    });
+
+    activeBtns.current = newActive;
+    setDpadActive(new Set(newActive));
+  };
+
+  const handleDpadStart = (e: React.PointerEvent) => {
+    if (isEditingLayout) return;
+    try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch (err) {}
+    handleDpadEvent(e);
+  };
+  
+  const handleDpadEnd = (e: React.PointerEvent) => {
+    if (isEditingLayout) return;
+    e.preventDefault();
+    try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch (err) {}
+    activeBtns.current.forEach(btn => onButtonUp(btn));
+    activeBtns.current.clear();
+    setDpadActive(new Set());
+  };
+
   const handleJoystickStart = (e: React.PointerEvent) => {
     e.preventDefault();
     try { (e.target as HTMLElement).setPointerCapture(e.pointerId); } catch (err) {}
@@ -277,29 +331,21 @@ export const Gamepad = ({ onButtonDown, onButtonUp, scale = 1, layout = 2, type 
         ) : (
           <div 
             className={`relative w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] flex shrink-0 select-none items-center justify-center touch-none ${isEditingLayout ? 'ring-4 ring-green-500 cursor-move rounded-full' : ''}`}
-            style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * gamepadScales.left})`, transformOrigin: 'bottom left' }}
-            onPointerDown={isEditingLayout ? handleDrag('left') : undefined}
-          >
-            <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700">
-              <button 
-                className="absolute top-0 w-10 h-12 bg-gray-400 rounded-t-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
-                onPointerDown={handleStart('up')} onPointerUp={handleEnd('up')} onPointerLeave={handleEnd('up')}
-              />
-              <button 
-                className="absolute bottom-0 w-10 h-12 bg-gray-400 rounded-b-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
-                onPointerDown={handleStart('down')} onPointerUp={handleEnd('down')} onPointerLeave={handleEnd('down')}
-              />
-              <button 
-                className="absolute left-0 w-12 h-10 bg-gray-400 rounded-l-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
-                onPointerDown={handleStart('left')} onPointerUp={handleEnd('left')} onPointerLeave={handleEnd('left')}
-              />
-              <button 
-                className="absolute right-0 w-12 h-10 bg-gray-400 rounded-r-lg active:bg-gray-500 active:scale-95 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10"
-                onPointerDown={handleStart('right')} onPointerUp={handleEnd('right')} onPointerLeave={handleEnd('right')}
-              />
-              <div className="absolute w-10 h-10 bg-gray-500 rounded-sm pointer-events-none"></div>
+              style={{ transform: `translate(${currentOffsets.left.x}px, ${currentOffsets.left.y}px) scale(${scale * (isLandscape ? 0.7 : 0.9) * gamepadScales.left})`, transformOrigin: 'bottom left' }}
+              onPointerDown={isEditingLayout ? handleDrag('left') : handleDpadStart}
+              onPointerMove={!isEditingLayout ? handleDpadEvent : undefined}
+              onPointerUp={!isEditingLayout ? handleDpadEnd : undefined}
+              onPointerCancel={!isEditingLayout ? handleDpadEnd : undefined}
+              onPointerLeave={!isEditingLayout ? handleDpadEnd : undefined}
+            >
+              <div className="relative w-32 h-32 flex items-center justify-center bg-gray-800 rounded-full shadow-[inset_0_5px_15px_rgba(0,0,0,0.8)] border-4 border-gray-700 pointer-events-none">
+                <div className={`absolute top-0 w-10 h-12 rounded-t-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10 transition-transform duration-75 ${dpadActive.has('up') ? 'bg-gray-500 scale-95' : 'bg-gray-400'}`} />
+                <div className={`absolute bottom-0 w-10 h-12 rounded-b-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10 transition-transform duration-75 ${dpadActive.has('down') ? 'bg-gray-500 scale-95' : 'bg-gray-400'}`} />
+                <div className={`absolute left-0 w-12 h-10 rounded-l-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10 transition-transform duration-75 ${dpadActive.has('left') ? 'bg-gray-500 scale-95' : 'bg-gray-400'}`} />
+                <div className={`absolute right-0 w-12 h-10 rounded-r-lg shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)] z-10 transition-transform duration-75 ${dpadActive.has('right') ? 'bg-gray-500 scale-95' : 'bg-gray-400'}`} />
+                <div className="absolute w-10 h-10 bg-gray-500 rounded-sm z-20"></div>
+              </div>
             </div>
-          </div>
         )}
         {/* Визуализация джойстика */}
           {joystickCenter && joystickThumb && (

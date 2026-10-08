@@ -1,7 +1,7 @@
 export const translations = {
   ru: {
         catalog_my_library: "Моя Библиотека",
-    btn_insert_coin: "Insert Coin",
+    btn_insert_coin: "ИГРАТЬ",
     confirm_delete: "Удалить игру",
         catalog_upload_file: "Загрузить свой файл",
     archive_search_placeholder: "Поиск по названию (напр. Mario)...",

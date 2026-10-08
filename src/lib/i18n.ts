@@ -1,5 +1,8 @@
 export const translations = {
   ru: {
+        catalog_my_library: "Моя Библиотека",
+    btn_insert_coin: "Insert Coin",
+    confirm_delete: "Удалить игру",
     catalog_title: "Топ 100 игр",
     catalog_tab_all: "Все",
     catalog_tab_nes: "Денди",
@@ -48,6 +51,9 @@ export const translations = {
     netplay_connected: "Подключено!",
   },
   en: {
+        catalog_my_library: "My Library",
+    btn_insert_coin: "Insert Coin",
+    confirm_delete: "Delete game",
     catalog_title: "Top 100 Games",
     catalog_tab_all: "All",
     catalog_tab_nes: "NES",

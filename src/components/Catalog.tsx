@@ -135,7 +135,7 @@ export const Catalog = () => {
 
   
 return (
-    <div className="min-h-full p-4 sm:p-6 bg-black relative overflow-hidden">
+    <div className="min-h-full p-4 sm:p-6 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 bg-[length:200%_200%] animate-gradient relative overflow-hidden">
       <Starfield />
       
       <div className="relative flex justify-between items-center mb-8 max-w-7xl mx-auto">
@@ -153,7 +153,7 @@ return (
             onClick={() => setShowArchive(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
           >
-            <span>🏛️</span> Каталог Игр
+            <span>🏛️</span> {t('btn_archive', language)}
           </button>
           <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full cursor-pointer font-bold shadow-lg transition-transform hover:scale-105 inline-block text-sm sm:text-base">
             Загрузить свой файл
@@ -170,11 +170,11 @@ return (
 
       {games.length > 0 && (
         <div className="relative max-w-7xl mx-auto mb-12">
-          <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Моя Библиотека</h2>
+          <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">{t('catalog_my_library', language)}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 p-2">
             {games.map(game => (
               <React.Fragment key={game.id}>
-                <GameCartridge title={game.title} system={game.system} imageUrl={`https://tse1.mm.bing.net/th?q=${encodeURIComponent(game.system + " game cover " + game.title)}`} onClick={() => handlePlay(game.id)} btnText="Insert Coin" onRemove={(e?: any) => { e?.stopPropagation(); if (window.confirm(`Удалить игру "${game.title}"?`)) removeGame(game.id); }} />
+                <GameCartridge title={game.title} system={game.system} imageUrl={`https://tse1.mm.bing.net/th?q=${encodeURIComponent(game.system + " game cover " + game.title)}`} onClick={() => handlePlay(game.id)} btnText={t('btn_insert_coin', language)} onRemove={(e?: any) => { e?.stopPropagation(); if (window.confirm(`${t('confirm_delete', language)} "${game.title}"?`)) removeGame(game.id); }} />
               </React.Fragment>
             ))}
           </div>
@@ -182,7 +182,7 @@ return (
       )}
 
       <div className="relative max-w-7xl mx-auto mb-8">
-                <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Топ 100 Игр (Archive)</h2>
+                <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">{t('catalog_title', language)}</h2>
         
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Все игры</button>

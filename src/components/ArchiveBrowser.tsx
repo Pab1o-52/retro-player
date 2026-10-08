@@ -109,7 +109,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
         
         <input 
           type="text" 
-          placeholder="Поиск по названию (напр. Mario)..." 
+          placeholder={t('archive_search_placeholder', language)} 
           className="bg-gray-800 border border-gray-700 text-white p-3 rounded-lg flex-[2]"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setLimit(50); }}

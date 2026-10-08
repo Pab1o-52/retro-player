@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore';
+import { t } from '../lib/i18n';
 import { Gamepad } from './Gamepad';
 import { Nostalgist } from 'nostalgist';
 import { netplayManager } from '../lib/multiplayer/NetplayManager';
@@ -10,7 +11,7 @@ try {
 } catch (e) {}
 
 export const Player = () => {
-  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds, isEditingLayout, setIsEditingLayout, gamepadScales, setGamepadScales } = useStore();
+  const { games, activeGameId, getRomBuffer, stopGame, saveGameState, loadGameState, joystickScale, buttonLayout, setButtonLayout, joystickType, setJoystickType, netplayStatus, setNetplayStatus, keyBinds, setKeyBinds, isEditingLayout, setIsEditingLayout, gamepadScales, setGamepadScales, language } = useStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nostalgistRef = useRef<any>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -365,7 +366,7 @@ export const Player = () => {
           </div>
           
           <div className="bg-black/90 p-4 rounded-xl border border-gray-700 w-full max-w-sm flex flex-col gap-3 pointer-events-auto mb-2">
-            <h3 className="text-white text-center font-bold">Размер кнопок</h3>
+            <h3 className="text-white text-center font-bold">{t('settings_button_size', language)}</h3>
             
             <div className="flex items-center gap-2">
               <label className="text-gray-300 text-xs w-20">Стик (лев):</label>
@@ -395,10 +396,10 @@ export const Player = () => {
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 w-full max-w-sm flex flex-col gap-3 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white text-center mb-1">Настройки</h2>
+            <h2 className="text-xl font-bold text-white text-center mb-1">{t('settings_title', language)}</h2>
             
             <div className="bg-gray-900 border border-blue-500/50 p-3 rounded-lg flex flex-col gap-2">
-              <h3 className="text-blue-400 font-bold">🌐 Мультиплеер (P2P)</h3>
+              <h3 className="text-blue-400 font-bold">{t('settings_multiplayer', language)}</h3>
               {inviteId ? (
                 <div>
                   <p className="text-sm text-gray-400 mb-1">Отправь эту ссылку другу (или ID):</p>
@@ -465,9 +466,9 @@ export const Player = () => {
 
 
             <div className="flex flex-col gap-2">
-              <label className="text-gray-300 font-medium">Количество кнопок</label>
+              <label className="text-gray-300 font-medium">{t('settings_buttons_count', language)}</label>
               <div className="flex flex-col gap-2 mt-4 mb-2">
-                <label className="text-gray-300 font-medium">Тип крестовины (Движение):</label>
+                <label className="text-gray-300 font-medium">{t('settings_dpad_type', language)}</label>
                 <div className="flex gap-2">
                   {['analog', 'dpad'].map(type => (
                     <button 
@@ -498,7 +499,7 @@ export const Player = () => {
               onClick={() => { setIsSettingsOpen(false); setIsKeyboardSettingsOpen(true); }}
               className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-bold shadow-md w-full"
             >
-              ⌨️ Настроить клавиатуру
+              НАЖМИТЕ...
             </button>
 
             <div className="w-full h-px bg-gray-700 my-1"></div>
@@ -507,7 +508,7 @@ export const Player = () => {
               onClick={handleFullScreen}
               className="bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg font-bold transition-colors"
             >
-              🖥 Full Screen
+              {t('player_fullscreen', language)}
             </button>
 
             <button 
@@ -534,7 +535,7 @@ export const Player = () => {
                   className={`flex justify-between items-center px-3 py-2 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
                 >
                   <span className="uppercase font-bold">{btn}</span>
-                  <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? 'НАЖМИТЕ...' : code.replace('Key', '').replace('Arrow', '')}</span>
+                  <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? (language === 'ru' ? 'НАЖМИТЕ...' : 'PRESS...') : code.replace('Key', '').replace('Arrow', '')}</span>
                 </button>
               ))}
             </div>
@@ -542,7 +543,7 @@ export const Player = () => {
               onClick={() => { setIsKeyboardSettingsOpen(false); setIsSettingsOpen(true); }}
               className="bg-gray-600 hover:bg-gray-500 text-white py-2 rounded-lg font-bold transition-colors mt-2 w-full"
             >
-              Назад в настройки
+              {t('settings_back', language)}
             </button>
           </div>
         </div>

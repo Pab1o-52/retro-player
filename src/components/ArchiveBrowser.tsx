@@ -120,12 +120,12 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            Загрузка базы игр... (это может занять пару секунд)
+            {t('archive_loading', language)}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {filtered.length === 0 && search && (
-              <div className="col-span-full text-center text-gray-500 mt-10">Игры не найдены</div>
+              <div className="col-span-full text-center text-gray-500 mt-10">{t('archive_not_found', language)}</div>
             )}
             {filtered.map(f => {
               const cleanName = f.name.replace(/\.(zip|nes|sfc|md|bin)$/i, '');

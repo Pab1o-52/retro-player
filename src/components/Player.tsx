@@ -68,7 +68,7 @@ export const Player = () => {
     let isCancelled = false;
 
     if (netplayManager.role === 'client') {
-      setDebugLog('Ожидание трансляции от Хоста...');
+      setDebugLog(t('debug_waiting_host', language));
       netplayManager.sendReady();
       return;
     }
@@ -208,7 +208,7 @@ export const Player = () => {
       // Nostalgist saveState returns a Blob, which we can save to IndexedDB
       await saveGameState(activeGameId, state);
       setIsSettingsOpen(false);
-      setDebugLog('Сохранено!');
+      setDebugLog(t('debug_saved', language));
       setTimeout(() => setDebugLog(''), 2000);
     }
   };
@@ -219,10 +219,10 @@ export const Player = () => {
       if (stateBlob) {
         await nostalgistRef.current.loadState(stateBlob.state); // nostalgist api
         setIsSettingsOpen(false);
-        setDebugLog('Загружено!');
+        setDebugLog(t('debug_loaded', language));
         setTimeout(() => setDebugLog(''), 2000);
       } else {
-        setDebugLog('Нет сохранений!');
+        setDebugLog(t('debug_no_save', language));
         setTimeout(() => setDebugLog(''), 2000);
       }
     }
@@ -362,19 +362,19 @@ export const Player = () => {
       {isEditingLayout && (
         <div className="fixed inset-0 z-[100] flex flex-col justify-between items-center pointer-events-none p-4">
           <div className="bg-black/80 text-white px-6 py-2 rounded-full font-bold shadow-2xl backdrop-blur border border-gray-700 mt-10">
-            Перетащите кнопки пальцем
+            {t('settings_drag_buttons', language)}
           </div>
           
           <div className="bg-black/90 p-4 rounded-xl border border-gray-700 w-full max-w-sm flex flex-col gap-3 pointer-events-auto mb-2">
             <h3 className="text-white text-center font-bold">{t('settings_button_size', language)}</h3>
             
             <div className="flex items-center gap-2">
-              <label className="text-gray-300 text-xs w-20">Стик (лев):</label>
+              <label className="text-gray-300 text-xs w-20">{t('settings_stick_left', language)}</label>
               <input type="range" min="0.5" max="2" step="0.1" value={gamepadScales.left} onChange={(e) => setGamepadScales({...gamepadScales, left: parseFloat(e.target.value)})} className="flex-1 accent-blue-500" />
             </div>
             
             <div className="flex items-center gap-2">
-              <label className="text-gray-300 text-xs w-20">Кнопки (прав):</label>
+              <label className="text-gray-300 text-xs w-20">{t('settings_buttons_right', language)}</label>
               <input type="range" min="0.5" max="2" step="0.1" value={gamepadScales.right} onChange={(e) => setGamepadScales({...gamepadScales, right: parseFloat(e.target.value)})} className="flex-1 accent-blue-500" />
             </div>
 
@@ -387,7 +387,7 @@ export const Player = () => {
             onClick={() => setIsEditingLayout(false)}
             className="bg-green-600 hover:bg-green-500 text-white px-10 py-4 rounded-full font-extrabold text-xl shadow-[0_10px_25px_rgba(0,0,0,0.8)] pointer-events-auto active:scale-95 transition-transform mb-10"
           >
-            Готово
+            {t('settings_done', language)}
           </button>
         </div>
       )}
@@ -402,7 +402,7 @@ export const Player = () => {
               <h3 className="text-blue-400 font-bold">{t('settings_multiplayer', language)}</h3>
               {inviteId ? (
                 <div>
-                  <p className="text-sm text-gray-400 mb-1">Отправь эту ссылку другу (или ID):</p>
+                  <p className="text-sm text-gray-400 mb-1">{t('netplay_share_desc', language)}</p>
                   <div className="flex gap-2 mb-2">
                     <input 
                       readOnly 
@@ -415,28 +415,28 @@ export const Player = () => {
                         const url = `${window.location.origin}${window.location.pathname}?join=${inviteId}`;
                         if (navigator.share) {
                           navigator.share({
-                            title: 'Присоединяйся к игре!',
-                            text: 'Давай играть вместе!',
+                            title: t('netplay_share_title', language),
+                            text: t('netplay_share_text', language),
                             url: url
                           }).catch(err => console.error(err));
                         } else {
                           navigator.clipboard.writeText(url);
-                          alert('Ссылка скопирована!');
+                          alert(t('netplay_copied', language));
                         }
                       }}
                       className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded font-bold shadow text-xs whitespace-nowrap"
                     >
-                      Поделиться
+                      {t('netplay_share_btn', language)}
                     </button>
                   </div>
                   <div className="text-xs text-center text-gray-500 mb-2">
-                    Статус: {netplayStatus || 'Ожидание P2...'}
+                    {t('netplay_status', language)} {netplayStatus || t('netplay_waiting', language)}
                   </div>
                   {netplayStatus === 'Connected' && netplayManager.role === 'host' && (
                     <button 
                       onClick={async () => {
                         if (nostalgistRef.current) {
-                          setDebugLog('Синхронизация...');
+                          setDebugLog(t('netplay_syncing', language));
                           const state = await nostalgistRef.current.saveState();
                           const buffer = await state.state.arrayBuffer();
                           netplayManager.sendSync(buffer);
@@ -446,7 +446,7 @@ export const Player = () => {
                       }}
                       className="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded font-bold w-full text-sm"
                     >
-                      🔄 Синхронизировать игру
+                      {t('netplay_sync_btn', language)}
                     </button>
                   )}
                 </div>
@@ -455,7 +455,7 @@ export const Player = () => {
                   onClick={handleHostGame}
                   className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold w-full"
                 >
-                  👥 Пригласить друга
+                  {t('netplay_invite_btn', language)}
                 </button>
               )}
             </div>
@@ -476,7 +476,7 @@ export const Player = () => {
                       onClick={() => setJoystickType(type as any)}
                       className={`flex-1 py-1 rounded font-bold transition-colors ${joystickType === type ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
                     >
-                      {type === 'analog' ? 'Аналог (Стик)' : 'Классика (Крестик)'}
+                      {type === 'analog' ? t('dpad_analog', language) : t('dpad_classic', language)}
                     </button>
                   ))}
                 </div>
@@ -486,10 +486,10 @@ export const Player = () => {
                 onChange={(e) => setButtonLayout(parseInt(e.target.value) as 2|3|4|6)}
                 className="w-full bg-gray-900 border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-500"
               >
-                <option value={2}>2 кнопки (A, B)</option>
-                <option value={3}>3 кнопки (A, B, C)</option>
-                <option value={4}>4 кнопки (A, B, X, Y)</option>
-                <option value={6}>6 кнопок (A, B, C, X, Y, Z)</option>
+                <option value={2}>{t('btn_count_2', language)}</option>
+                <option value={3}>{t('btn_count_3', language)}</option>
+                <option value={4}>{t('btn_count_4', language)}</option>
+                <option value={6}>{t('btn_count_6', language)}</option>
               </select>
             </div>
 
@@ -499,7 +499,7 @@ export const Player = () => {
               onClick={() => { setIsSettingsOpen(false); setIsKeyboardSettingsOpen(true); }}
               className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-bold shadow-md w-full"
             >
-              НАЖМИТЕ...
+              {t('settings_press_key', language)}
             </button>
 
             <div className="w-full h-px bg-gray-700 my-1"></div>
@@ -515,7 +515,7 @@ export const Player = () => {
               onClick={() => setIsSettingsOpen(false)}
               className="bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg font-bold transition-colors mt-2"
             >
-              Закрыть
+              {t('settings_close', language)}
             </button>
           </div>
         </div>
@@ -525,7 +525,7 @@ export const Player = () => {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-2xl">
             <h2 className="text-xl font-bold text-white text-center mb-2 flex items-center justify-center gap-2">
-              ⌨️ Настройка клавиатуры
+              {t('settings_keyboard_title', language)}
             </h2>
             <div className="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto pr-1">
               {Object.entries(keyBinds).map(([btn, code]) => (
@@ -535,7 +535,7 @@ export const Player = () => {
                   className={`flex justify-between items-center px-3 py-2 rounded border text-sm transition-colors ${mappingBtn === btn ? 'bg-blue-600 border-blue-400 text-white animate-pulse' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
                 >
                   <span className="uppercase font-bold">{btn}</span>
-                  <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? (language === 'ru' ? 'НАЖМИТЕ...' : 'PRESS...') : code.replace('Key', '').replace('Arrow', '')}</span>
+                  <span className="text-gray-100 font-mono text-xs">{mappingBtn === btn ? t('settings_press_key', language) : code.replace('Key', '').replace('Arrow', '')}</span>
                 </button>
               ))}
             </div>

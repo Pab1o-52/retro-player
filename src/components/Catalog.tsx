@@ -7,6 +7,7 @@ import { t } from '../lib/i18n';
 
 
 const GameCartridge = ({ title, system, imageUrl, onClick, btnText, downloadingText, onRemove, isDownloading, isReady, progress }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, downloadingText?: string, onRemove?: (e?: any) => void, isDownloading?: boolean, isReady?: boolean, progress?: number }) => {
+  const language = useStore(s => s.language);
   const [imgSrc, setImgSrc] = useState(imageUrl);
   const [failed, setFailed] = useState(false);
 
@@ -17,7 +18,7 @@ const GameCartridge = ({ title, system, imageUrl, onClick, btnText, downloadingT
         <button
           onClick={onRemove}
           className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full font-bold flex justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg border-2 border-gray-900 z-10 hover:bg-red-500 hover:scale-110"
-          title="Удалить"
+          title={t('btn_delete_title', language)}
         >
           ×
         </button>
@@ -156,7 +157,7 @@ return (
             <span>🏛️</span> {t('btn_archive', language)}
           </button>
           <label className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full cursor-pointer font-bold shadow-lg transition-transform hover:scale-105 inline-block text-sm sm:text-base">
-            Загрузить свой файл
+            {t('catalog_upload_file', language)}
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -185,7 +186,7 @@ return (
                 <h2 className="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">{t('catalog_title', language)}</h2>
         
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-          <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Все игры</button>
+          <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>{t('catalog_tab_all', language)}</button>
           <button onClick={() => setActiveTab('nes')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'nes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Dendy (NES)</button>
           <button onClick={() => setActiveTab('segaMD')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'segaMD' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Sega</button>
           <button onClick={() => setActiveTab('snes')} className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition-colors ${activeTab === 'snes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700'}`}>Super Nintendo</button>

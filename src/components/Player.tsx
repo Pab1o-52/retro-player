@@ -395,10 +395,10 @@ export const Player = () => {
 
       {isSettingsOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 w-full max-w-sm flex flex-col gap-3 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white text-center mb-1">{t('settings_title', language)}</h2>
+          <div className="bg-gray-800 border border-gray-700 rounded-xl p-3 w-full max-w-sm flex flex-col gap-2 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold text-white text-center mb-0.5">{t('settings_title', language)}</h2>
             
-            <div className="bg-gray-900 border border-blue-500/50 p-3 rounded-lg flex flex-col gap-2">
+            <div className="bg-gray-900 border border-blue-500/50 p-2 rounded-lg flex flex-col gap-1.5">
               <h3 className="text-blue-400 font-bold">{t('settings_multiplayer', language)}</h3>
               {inviteId ? (
                 <div>
@@ -444,7 +444,7 @@ export const Player = () => {
                           setTimeout(() => setDebugLog(''), 2000);
                         }
                       }}
-                      className="bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded font-bold w-full text-sm"
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white py-1.5 rounded font-bold w-full text-sm"
                     >
                       {t('netplay_sync_btn', language)}
                     </button>
@@ -453,21 +453,21 @@ export const Player = () => {
               ) : (
                 <button 
                   onClick={handleHostGame}
-                  className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold w-full"
+                  className="bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded font-bold w-full text-sm"
                 >
                   {t('netplay_invite_btn', language)}
                 </button>
               )}
             </div>
 
-            <div className="w-full h-px bg-gray-700 my-1"></div>
+            <div className="w-full h-px bg-gray-700 my-0.5"></div>
 
             
 
 
             <div className="flex flex-col gap-2">
               <label className="text-gray-300 font-medium">{t('settings_buttons_count', language)}</label>
-              <div className="flex flex-col gap-2 mt-4 mb-2">
+              <div className="flex flex-col gap-1.5 mt-1 mb-1">
                 <label className="text-gray-300 font-medium">{t('settings_dpad_type', language)}</label>
                 <div className="flex gap-2">
                   {['analog', 'dpad'].map(type => (
@@ -493,16 +493,16 @@ export const Player = () => {
               </select>
             </div>
 
-            <div className="w-full h-px bg-gray-700 my-1"></div>
+            <div className="w-full h-px bg-gray-700 my-0.5"></div>
             
             <button 
               onClick={() => { setIsSettingsOpen(false); setIsKeyboardSettingsOpen(true); }}
               className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-bold shadow-md w-full"
             >
-              {t('settings_press_key', language)}
+              {t('settings_keyboard_title', language)}
             </button>
 
-            <div className="w-full h-px bg-gray-700 my-1"></div>
+            <div className="w-full h-px bg-gray-700 my-0.5"></div>
 
             <button 
               onClick={handleFullScreen}

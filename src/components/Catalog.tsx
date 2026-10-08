@@ -3,9 +3,10 @@ import { ArchiveBrowser } from './ArchiveBrowser';
 import { useStore } from '../store/useStore';
 import { FEATURED_GAMES } from '../lib/FeaturedGames';
 import { Starfield } from './Starfield';
+import { t } from '../lib/i18n';
 
 
-const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, isDownloading, isReady }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, onRemove?: () => void, isDownloading?: boolean, isReady?: boolean, progress?: number }) => {
+const GameCartridge = ({ title, system, imageUrl, onClick, btnText, downloadingText, onRemove, isDownloading, isReady, progress }: { title: string, system: string, imageUrl: string, onClick: () => void, btnText: string, downloadingText?: string, onRemove?: (e?: any) => void, isDownloading?: boolean, isReady?: boolean, progress?: number }) => {
   const [imgSrc, setImgSrc] = useState(imageUrl);
   const [failed, setFailed] = useState(false);
 
@@ -54,7 +55,7 @@ const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, is
           disabled={isDownloading}
           className={`w-full bg-gradient-to-b ${isReady ? 'from-green-600 to-green-800 hover:from-green-500 hover:to-green-700 border-green-900' : 'from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 border-red-900'} border text-white px-2 py-1.5 sm:px-4 sm:py-2 rounded font-extrabold shadow-[0_4px_6px_rgba(0,0,0,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all uppercase tracking-wider text-[10px] sm:text-sm ${isDownloading ? 'opacity-50 cursor-wait' : ''}`}
         >
-          {isDownloading ? 'Загрузка...' : btnText}
+          {isDownloading ? (progress && progress > 0 ? `${Math.round(progress)}%` : (downloadingText || 'Downloading...')) : btnText}
         </button>
       </div>
     </div>
@@ -63,7 +64,7 @@ const GameCartridge = ({ title, system, imageUrl, onClick, btnText, onRemove, is
 
 export const Catalog = () => {
 
-  const { games, addGame, loadGames, removeGame, playGame } = useStore();
+  const { games, addGame, loadGames, removeGame, playGame, language, setLanguage } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showArchive, setShowArchive] = useState(false);
   
@@ -124,7 +125,7 @@ export const Catalog = () => {
       const file = new File([blob], `${game.title}${ext}`, { type: blob.type });
       await addGame(file, game.system);
     } catch (e) {
-      alert('Ошибка при загрузке игры.');
+      alert(t('error_download', language));
       console.error(e);
     } finally {
       setDownloadingId(null);
@@ -138,9 +139,16 @@ return (
       <Starfield />
       
       <div className="relative flex justify-between items-center mb-8 max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold">Retro Player</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-[pulse_3s_ease-in-out_infinite] tracking-tight">Retro Player</h1>
         
         <div className="flex gap-2 sm:gap-4">
+          <button 
+            onClick={() => setLanguage(language === 'ru' ? 'en' : 'ru')}
+            className="bg-gray-800/80 hover:bg-gray-700/80 border border-gray-600 text-white p-2 rounded-full font-bold shadow-lg transition-transform hover:scale-110 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 backdrop-blur-sm"
+            title="Change Language"
+          >
+            <span className="text-xs sm:text-sm">{language.toUpperCase()}</span>
+          </button>
           <button 
             onClick={() => setShowArchive(true)}
             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-full font-bold shadow-lg transition-transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
@@ -199,7 +207,7 @@ return (
                         handleDownloadFeatured(game);
                       }
                     }} 
-                    btnText={downloadedGame ? "ИГРАТЬ" : "СКАЧАТЬ"} 
+                    btnText={downloadedGame ? t('btn_play', language) : t('btn_download', language)} downloadingText={t('btn_downloading', language)} 
                     isDownloading={downloadingId === game.id} progress={downloadingId === game.id ? downloadProgress : 0} 
                     isReady={!!downloadedGame}
                   />

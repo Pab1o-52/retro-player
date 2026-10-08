@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import localforage from 'localforage';
+import { getBrowserLanguage } from '../lib/i18n';
+import type { Language } from '../lib/i18n';
 
 localforage.config({
   name: 'RetroPlayer',
@@ -42,6 +44,8 @@ interface EmulatorState {
   setGamepadScales: (scales: any) => void;
   keyBinds: Record<string, string>;
   setKeyBinds: (binds: Record<string, string>) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
   netplayStatus: string | null;
   setNetplayStatus: (status: string | null) => void;
   netplayGameBuffer: ArrayBuffer | null;
@@ -113,6 +117,11 @@ export const useStore = create<EmulatorState>((set, get) => ({
   setGamepadScales: (scales) => {
     localStorage.setItem('gamepadScales', JSON.stringify(scales));
     set({ gamepadScales: scales });
+  },
+  language: (localStorage.getItem('language') as Language) || getBrowserLanguage(),
+  setLanguage: (lang) => {
+    localStorage.setItem('language', lang);
+    set({ language: lang });
   },
   keyBinds: {
     up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',

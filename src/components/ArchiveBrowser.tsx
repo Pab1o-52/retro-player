@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { t } from '../lib/i18n';
+import { useStore } from '../store/useStore';
 
 const COLLECTIONS = [
   { id: 'No-Intro_NES', name: 'NES (Dendy)', system: 'nes' },
@@ -12,6 +14,7 @@ interface ArchiveFile {
 }
 
 export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: File, system: string) => void, onClose: () => void }) => {
+  const language = useStore(s => s.language);
   const [collection, setCollection] = useState(COLLECTIONS[0]);
   const [files, setFiles] = useState<ArchiveFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -74,7 +77,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
       onDownload(newFile, collection.system);
     } catch (e) {
       console.error(e);
-      alert("Ошибка загрузки. Возможно файл недоступен из-за CORS или заблокирован.");
+      alert(t('archive_error', language));
     } finally {
       setDownloading(null);
       setProgress(0);
@@ -88,7 +91,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[200] flex flex-col p-4 sm:p-8 overflow-hidden text-white font-sans">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-3">
-          <span className="text-4xl">🏛️</span> Archive.org Каталог
+          <span className="text-4xl">🏛️</span> {t('archive_title', language)}
         </h2>
         <button onClick={onClose} className="text-gray-400 hover:text-white text-3xl">&times;</button>
       </div>
@@ -141,7 +144,7 @@ export const ArchiveBrowser = ({ onDownload, onClose }: { onDownload: (file: Fil
                     {isDownloading && progress > 0 && (
                       <div className="absolute top-0 left-0 h-full bg-blue-500 opacity-60 pointer-events-none transition-all duration-300" style={{ width: `${progress}%` }} />
                     )}
-                    <span className="relative z-10">{isDownloading ? (progress > 0 ? `${Math.round(progress)}%` : 'Загрузка...') : 'СКАЧАТЬ'}</span>
+                    <span className="relative z-10">{isDownloading ? (progress > 0 ? `${Math.round(progress)}%` : t('btn_downloading', language)) : t('btn_download', language)}</span>
                   </button>
                 </div>
               );

@@ -139,7 +139,7 @@ return (
       <Starfield />
       
       <div className="relative flex justify-between items-center mb-8 max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-[pulse_3s_ease-in-out_infinite] tracking-tight">Retro Player</h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-500 to-cyan-400 bg-[length:200%_auto] animate-gradient tracking-tight">Retro Player</h1>
         
         <div className="flex gap-2 sm:gap-4">
           <button 
